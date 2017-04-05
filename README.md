@@ -37,3 +37,4 @@ Translators
 * Spanish - [Andrés Hernández](https://gitlab.com/u/auroszx)
 * Japanese - [naofum](https://gitlab.com/u/naofumi)
 * Russian - [ashed](https://gitlab.com/u/ashed)
+* German - [Christian](https://gitlab.com/u/epinez)
