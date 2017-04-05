@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">Syncopoli</string>
+    <string name="action_settings">Einstellungen</string>
+
+    <string name="backup_title">Backup</string>
+    <string name="settings_title">Einstellungen</string>
+    <string name="action_run_backup">Starte Backup</string>
+
+    <string name="addbackupitem_name">Profilname</string>
+    <string name="addbackupitem_origin">Quelle</string>
+    <string name="addbackupitem_destination">Ziel</string>
+    <string name="addbackupitem_direction_prompt">Backup Richtung</string>
+    <string-array name="addbackupitem_direction_entries">
+        <item>Remote → Lokal</item>
+        <item>Lokal → Remote</item>
+    </string-array>
+
+    <!-- Action bar icons -->
+    <string name="action_refresh">Aktualisieren</string>
+    <string name="action_done">Fertig</string>
+    <string name="action_run">Starte alle Backups</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- General settings -->
+    <string name="pref_header_general">Allgemein</string>
+    <string name="pref_title_server_address">Serveradresse</string>
+    <string name="pref_title_private_key">Privater Schlüssel</string>
+    <string name="pref_title_username">Benutzer</string>
+    <string name="pref_title_options">Zusätzliche Optionen</string>
+    <string name="pref_title_protocol">Protokoll</string>
+    <string name="pref_default_protocol">Rsync</string>
+    <string name="pref_title_port">Port</string>
+    <string name="pref_title_frequency">Häufigkeit (Stunden)</string>
+    <string name="pref_title_rsync_password">Rsync Passwort</string>
+    <string name="pref_title_wifi_only">Nur bei WLAN-Verbindung</string>
+    
+    <string-array name="pref_entries_protocol">
+        <item>SSH</item>
+        <item>Rsync</item>
+    </string-array>
+
+    <string name="pref_category_general">Allgemein</string>
+    <string name="pref_category_sync_backup">Sync &amp; Backup</string>
+
+    <string name="pref_sum_wifi_only">Die Synchronisation läuft nur über WLAN</string>
+    <string name="pref_sum_no_wifi_only">Die Synchronisation läuft unabhängig von der Netzwerkverbindung (Mobile Daten können beansprucht werden)</string>
+</resources>
