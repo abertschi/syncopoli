@@ -7,9 +7,11 @@ import android.app.FragmentTransaction;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
 import android.support.design.widget.Snackbar;
@@ -36,6 +38,27 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
     public static final String SYNC_ACCOUNT_NAME = "Syncopoli Sync Account";
     public static final String SYNC_ACCOUNT_TYPE = "org.amoradi.syncopoli";
 
+	protected class Perm {
+		public String value;
+		public int code;
+
+		public Perm(String v, int c) {
+			value = v;
+			code = c;
+		}
+	}
+
+	Perm[] mPerms = {
+		new Perm(android.Manifest.permission.READ_EXTERNAL_STORAGE, 1),
+		new Perm(android.Manifest.permission.INTERNET, 2),
+		// new Perm(android.Manifest.permission.AUTHENTICATE_ACCOUNTS, 3),
+		new Perm(android.Manifest.permission.READ_SYNC_SETTINGS, 4),
+		new Perm(android.Manifest.permission.WRITE_SYNC_SETTINGS, 5),
+		new Perm(android.Manifest.permission.READ_SYNC_SETTINGS, 6),
+		new Perm(android.Manifest.permission.WAKE_LOCK, 7),
+		new Perm(android.Manifest.permission.ACCESS_NETWORK_STATE, 8)
+	};
+
     Account mAccount;
     BackupHandler mBackupHandler;
 
@@ -44,7 +67,15 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_backup);
 
-        mAccount = createSyncAccount(this);
+		setup(true);
+	}
+
+	protected void setup(boolean checkPerms) {
+		if (checkPerms) {
+			checkRuntimePerms();
+		}
+
+		mAccount = createSyncAccount(this);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         long freq = Long.parseLong(prefs.getString(SettingsFragment.KEY_FREQUENCY, "8"));
@@ -60,6 +91,26 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         f.setBackupHandler(this);
         setCurrentFragment(f, false);
     }
+
+	protected boolean checkRuntimePerms() {
+		if (Build.VERSION.SDK_INT >= 23) {
+			for (Perm p : mPerms) {
+				if (checkSelfPermission(p.value) != PackageManager.PERMISSION_GRANTED) {
+					requestPermissions(new String[]{p.value}, p.code);
+					return false;
+				}
+			}
+		}		
+
+		return true;
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int code, String[] permissions, int[] grantResults) {
+		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+			setup(false);
+		}
+	}
 
     @Override
     public void setContentView(@LayoutRes int layoutResId) {
