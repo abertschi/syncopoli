@@ -22,6 +22,25 @@ External binaries
 -----------------
 `rsync` and `ssh` (dropbear ssh) binaries are included here and are themselves open source projects. The sources for these binaries have not been modified.
 
+Interoperability
+----------------
+As of a01af010, syncopoli can receive broadcast intents from other applications and runs the specified sync service. The application needs to know the name of the sync profile to run. Approximately, the code would look like:
+
+```java
+Intent intent = new Intent();
+intent.setAction("org.amoradi.syncopoli.SYNC_PROFILE");
+intent.putExtra("profile_name", "my profile name");
+sendBroadcast(intent);
+```
+
+The following intents are supported (may expand in the future) (merge requests welcome):
+
+```
+org.amoradi.syncopoli.SYNC_PROFILE
+```
+
+I expect the user of your application will set the profile name as has been setup in syncopoli.
+
 FAQ
 ---
 
