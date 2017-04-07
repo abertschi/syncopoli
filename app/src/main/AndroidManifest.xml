@@ -55,8 +55,13 @@
             <intent-filter>
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED"/>
                 <action android:name="android.net.wifi.STATE_CHANGE"/>
+                <action android:name="org.amoradi.syncopoli.SYNC_PROFILE"/>
             </intent-filter>
         </receiver>
+
+		<service
+			android:name=".BackupBackgroundService"
+			android:exported="false" />
 
     </application>
 </manifest>

@@ -11,21 +11,32 @@ import android.os.Bundle;
 public class BackupReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context ctx, Intent intent) {
-        if (!intent.getAction().equals("android.net.wifi.WIFI_STATE_CHANGED") &&
-            !intent.getAction().equals("android.net.wifi.STATE_CHANGE")) {
-            return;
+        if (intent.getAction().equals("android.net.wifi.WIFI_STATE_CHANGED") ||
+            intent.getAction().equals("android.net.wifi.STATE_CHANGE")) {
+            BackupHandler h = new BackupHandler(ctx);
+            if (h.getRunOnWifi() && h.canRunBackup()) {
+                Account acc = new Account(BackupActivity.SYNC_ACCOUNT_NAME, BackupActivity.SYNC_ACCOUNT_TYPE);
+
+                Bundle settingsBundle = new Bundle();
+                settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+                settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+
+                h.setRunOnWifi(false);
+                ContentResolver.requestSync(acc, BackupActivity.SYNC_AUTHORITY, settingsBundle);
+            }
         }
 
-        BackupHandler h = new BackupHandler(ctx);
-        if (h.getRunOnWifi() && h.canRunBackup()) {
-            Account acc = new Account(BackupActivity.SYNC_ACCOUNT_NAME, BackupActivity.SYNC_ACCOUNT_TYPE);
+        if (intent.getAction().equals("org.amoradi.syncopoli.SYNC_PROFILE")) {
+            BackupHandler bh = new BackupHandler(ctx);
+            BackupItem b = bh.findBackup(intent.getStringExtra("profile_name"));
 
-            Bundle settingsBundle = new Bundle();
-            settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-            settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+            if (b == null) {
+                return;
+            }
 
-            h.setRunOnWifi(false);
-            ContentResolver.requestSync(acc, BackupActivity.SYNC_AUTHORITY, settingsBundle);
+            Intent i = new Intent(ctx, BackupBackgroundService.class);
+            i.putExtra("item", b);
+            ctx.startService(i);
         }
     }
 }

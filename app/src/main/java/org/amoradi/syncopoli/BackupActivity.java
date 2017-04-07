@@ -6,12 +6,13 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
 import android.support.design.widget.Snackbar;
@@ -144,11 +145,17 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
     }
 
     public void syncBackups() {
-        Snackbar.make(findViewById(R.id.backuplist_coordinator), "Running all sync tasks", Snackbar.LENGTH_SHORT).show();
-        Bundle settingsBundle = new Bundle();
-        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        ContentResolver.requestSync(mAccount, SYNC_AUTHORITY, settingsBundle);
+        Snackbar.make(findViewById(R.id.backuplist_coordinator),
+					  "Running all sync tasks",
+					  Snackbar.LENGTH_SHORT).show();
+
+        List<BackupItem> bs = mBackupHandler.getBackups();
+        BackupItem[] backups = new BackupItem[bs.size()];
+        bs.toArray(backups);
+
+        Intent i = new Intent(this, BackupBackgroundService.class);
+        i.putExtra("items", backups);
+        startService(i);
     }
 
     @Override
