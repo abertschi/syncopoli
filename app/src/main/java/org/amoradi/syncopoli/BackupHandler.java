@@ -106,6 +106,16 @@ public class BackupHandler implements IBackupHandler {
         return mBackupItems;
     }
 
+    public BackupItem findBackup(String name) {
+        for (BackupItem b : mBackupItems) {
+            if (b.name.equals(name)) {
+                return b;
+            }
+        }
+
+        return null;
+    }
+
     public void updateBackupList() {
         List<BackupItem> bl = new ArrayList<>();
 

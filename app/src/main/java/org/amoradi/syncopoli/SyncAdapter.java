@@ -4,8 +4,11 @@ import android.accounts.Account;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SyncResult;
 import android.os.Bundle;
+
+import java.util.List;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public SyncAdapter(Context ctx, boolean autoInit) {
@@ -20,12 +23,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account acc, Bundle bun, String authority, ContentProviderClient cpc, SyncResult res) {
         BackupHandler backupHandler = new BackupHandler(getContext());
 
-        for (BackupItem b : backupHandler.getBackups()) {
-            int ret = backupHandler.runBackup(b);
+        List<BackupItem> bs = backupHandler.getBackups();
+        BackupItem[] backups = new BackupItem[bs.size()];
+        bs.toArray(backups);
 
-            if (ret == BackupHandler.ERROR_NO_WIFI) {
-                backupHandler.setRunOnWifi(true);
-            }
-        }
+        Intent i = new Intent(getContext(), BackupBackgroundService.class);
+        i.putExtra("items", backups);
+        getContext().startService(i);
     }
 }
