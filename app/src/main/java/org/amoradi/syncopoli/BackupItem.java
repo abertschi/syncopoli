@@ -35,7 +35,12 @@ class BackupItem implements Parcelable {
 		out.writeString(logFileName);
 
 		Format ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		out.writeString(ft.format(lastUpdate));
+
+		try {
+			out.writeString(ft.format(lastUpdate));
+		} catch (IllegalArgumentException e) {
+			out.writeString(ft.format(new Date()));
+		}
 
 		if (direction == Direction.OUTGOING) {
 			out.writeString("OUTGOING");
