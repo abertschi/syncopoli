@@ -1,3 +1,13 @@
+v0.3
+----
+- become a good appizen: respond to sync requests by other apps
+- support android 7.1 (api level 25) + storage permissions
+- check whether private key is readable
+- notification when syncing (will be configurable in the near future)
+- add new translations
+  - Russian - Christian (https://gitlab.com/u/epinez)
+  - German - ashed (https://gitlab.com/u/ashed)
+
 v0.2
 ----
 - Logs are now copyable
