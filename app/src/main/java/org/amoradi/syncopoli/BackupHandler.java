@@ -264,6 +264,13 @@ public class BackupHandler implements IBackupHandler {
                 return -1;
             }
 
+            // make sure private_key is readable
+            File pkey_file = new File(private_key);
+            if (!pkey_file.equals("") && !pkey_file.canRead()) {
+                logFile.write(("ERROR: Cannot read private key file: '" + private_key + "'").getBytes());
+                return -1;
+            }
+
             /*
              * BUILD ARGUMENTS
              */
