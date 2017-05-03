@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.NotificationCompat;
 
 public class BackupBackgroundService extends IntentService {
@@ -26,9 +27,10 @@ public class BackupBackgroundService extends IntentService {
             return;
         }
 
-        BackupItem[] bs = (BackupItem[]) bundle.getParcelableArray("items");
-        for (BackupItem x : bs) {
-            runTask(x);
+        Parcelable[] ps = bundle.getParcelableArray("items");
+        for (Parcelable x : ps) {
+            BackupItem y = (BackupItem) x;
+            runTask(y);
         }
 
 	}
@@ -50,6 +52,7 @@ public class BackupBackgroundService extends IntentService {
 
         BackupHandler h = new BackupHandler(getApplicationContext());
         h.runBackup(b);
+
 
         notifyMan.cancel(NOTIFICATION_ID);
     }
