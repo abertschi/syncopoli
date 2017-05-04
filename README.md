@@ -3,16 +3,24 @@ Syncopoli - Rsync for Android
 
 [<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="60">](https://f-droid.org/app/org.amoradi.syncopoli)
 
-Options
--------
+Global Options
+--------------
 * Server address - The IP address of your server
 * Protocol - Rsync or SSH
-* Port - Self explanatory
+* Port - Port where rsync or ssh daemon is listening
 * User - This should be your rsync user or ssh user (depending on protocol)
 * Additional Options - Any additional options you want to give rsync
 * Private key - Should be your dropbear-compatible ssh key (see below)
 * Rsync Password - password used to authenticate with the Rsync daemon
 * Frequency - How often you want to run all the sync profiles (in hours)
+
+Profile Options
+---------------
+* Direction - `local` means phone, `remote` means whatever server is on the internet side
+* Profile name - This is for your own recognition, set it to whatever you like
+* Origin - The source directory/file
+* Destination - The destination directory
+* Additional Options - Set additional rsync options if this profile needs additional options
 
 SSH Key
 -------
@@ -44,9 +52,13 @@ I expect the user of your application will set the profile name as has been setu
 FAQ
 ---
 
-Q: Why is Syncopoli making connections to <someservername>?
+Q: Why is Syncopoli making connections to `<someservername>`?
 
-A: Syncopoli needs `rsync` and `ssh` (dropbearssh) to operate. Since F-Droid does not allow bundling of binary files, I have hosted them on <someservername> and download those two when you first run the program. If you don't trust the binaries and have your phone rooted, just put `rsync` and `ssh` binaries that you have compiled yourself in `/data/data/org.amoradi.topoli` and Syncopoli will use those ones instead.
+A: Syncopoli needs `rsync` and `ssh` (dropbearssh) to operate. Since F-Droid does not allow bundling of binary files, I have hosted them on `<someservername>` and download those two when you first run the program. If you don't trust the binaries and have your phone rooted, just put `rsync` and `ssh` binaries that you have compiled yourself in `/data/data/org.amoradi.syncopoli/files` and Syncopoli will use those ones instead (make sure to set them as executables).
+
+Q: How do I use this...thing?
+
+A: Set your global options by going to `settings` (see `Global Options` above), then press the plus button to create individual profiles. The play button on top bar runs all sync tasks. Hold your finger over each profile to edit/delete them.
 
 Credits
 =======
