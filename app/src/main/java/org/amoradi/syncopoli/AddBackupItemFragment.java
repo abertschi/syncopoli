@@ -2,6 +2,8 @@ package org.amoradi.syncopoli;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.view.LayoutInflater;
@@ -12,12 +14,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import fr.ganfra.materialspinner.MaterialSpinner;
+
+import static android.app.Activity.RESULT_OK;
 
 public class AddBackupItemFragment extends Fragment {
     IBackupHandler mHandler;
     BackupItem mBackup = null;
+    int SOURCE_REQUEST_CODE = 1;
+
+    private TextInputEditText v_name;
+    private TextInputEditText v_src;
+    private TextInputEditText v_dst;
+    private TextInputEditText v_opts;
 
     @Override
     public void onAttach(Activity acc) {
@@ -40,16 +51,36 @@ public class AddBackupItemFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_addbackupitem, container, false);
 
-        if (mBackup == null) {
-            return v;
-        }
+        v_name = (TextInputEditText) v.findViewById(R.id.addbackupitem_name);
+        v_src = (TextInputEditText) v.findViewById(R.id.addbackupitem_source);
+        v_dst = (TextInputEditText) v.findViewById(R.id.addbackupitem_destination);
+        v_opts = (TextInputEditText) v.findViewById(R.id.addbackupitem_rsync_options);
+
+        v_src.setOnLongClickListener(new View.OnLongClickListener () {
+            @Override
+            public boolean onLongClick(View v) {
+                Intent intent = new Intent("org.openintents.action.PICK_DIRECTORY");
+                intent.putExtra("org.openintents.extra.TITLE", "Source Directory");
+                intent.putExtra("org.openintents.extra.BUTTON_TEXT", "Select Directory");
+                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivityForResult(intent, SOURCE_REQUEST_CODE);
+                } else {
+                    Toast.makeText(getActivity(), "Error: requires OI File Manager", Toast.LENGTH_SHORT).show();
+                }
+
+                return true;
+            }
+        });
 
         MaterialSpinner v_dir = (MaterialSpinner) v.findViewById(R.id.addbackupitem_direction);
         String[] items = getResources().getStringArray(R.array.addbackupitem_direction_entries);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, items);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, items);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         v_dir.setAdapter(adapter);
 
+        if (mBackup == null) {
+            return v;
+        }
 
         if (mBackup.direction == BackupItem.Direction.OUTGOING) {
             v_dir.setSelection(1);
@@ -57,19 +88,20 @@ public class AddBackupItemFragment extends Fragment {
             v_dir.setSelection(0);
         }
 
-        TextInputEditText v_name = (TextInputEditText) v.findViewById(R.id.addbackupitem_name);
         v_name.setText(mBackup.name);
-
-        TextInputEditText v_src = (TextInputEditText) v.findViewById(R.id.addbackupitem_source);
         v_src.setText(mBackup.source);
-
-        TextInputEditText v_dst = (TextInputEditText) v.findViewById(R.id.addbackupitem_destination);
         v_dst.setText(mBackup.destination);
-
-        TextInputEditText v_opts = (TextInputEditText) v.findViewById(R.id.addbackupitem_rsync_options);
         v_opts.setText(mBackup.rsync_options);
 
         return v;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SOURCE_REQUEST_CODE && resultCode == RESULT_OK) {
+            Uri path = data.getData();
+            v_src.setText(path.getPath());
+        }
     }
 
     @Override
