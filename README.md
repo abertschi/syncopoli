@@ -60,6 +60,10 @@ Q: How do I use this...thing?
 
 A: Set your global options by going to `settings` (see `Global Options` above), then press the plus button to create individual profiles. The play button on top bar runs all sync tasks. Hold your finger over each profile to edit/delete them.
 
+Q: Typing paths is tedious.
+
+A: I know. Just long-press on Origin path. Make sure you have OI File Manager installed.
+
 Credits
 =======
 
