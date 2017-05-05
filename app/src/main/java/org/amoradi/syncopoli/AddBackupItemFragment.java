@@ -10,8 +10,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
+
+import fr.ganfra.materialspinner.MaterialSpinner;
 
 public class AddBackupItemFragment extends Fragment {
     IBackupHandler mHandler;
@@ -42,7 +44,13 @@ public class AddBackupItemFragment extends Fragment {
             return v;
         }
 
-        Spinner v_dir = (Spinner) v.findViewById(R.id.addbackupitem_direction);
+        MaterialSpinner v_dir = (MaterialSpinner) v.findViewById(R.id.addbackupitem_direction);
+        String[] items = getResources().getStringArray(R.array.addbackupitem_direction_entries);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        v_dir.setAdapter(adapter);
+
+
         if (mBackup.direction == BackupItem.Direction.OUTGOING) {
             v_dir.setSelection(1);
         } else {
@@ -93,10 +101,8 @@ public class AddBackupItemFragment extends Fragment {
             t = (EditText) v.findViewById(R.id.addbackupitem_rsync_options);
             i.rsync_options = t.getText().toString();
 
-            Spinner s = (Spinner) v.findViewById(R.id.addbackupitem_direction);
-            String dir = s.getSelectedItem().toString();
-
-            if (dir.equals("Remote to local")) {
+            MaterialSpinner s = (MaterialSpinner) v.findViewById(R.id.addbackupitem_direction);
+            if (s.getSelectedItemPosition() == 0) {
                 i.direction = BackupItem.Direction.INCOMING;
             } else {
                 i.direction = BackupItem.Direction.OUTGOING;
