@@ -1,3 +1,9 @@
+v0.3.1
+------
+- fix upgrade from v0.2 to v0.3 deleting profiles
+- add OI File Manager integration to select source directories
+- don't require private key when using rsync protocol
+
 v0.3
 ----
 - become a good appizen: respond to sync requests by other apps
