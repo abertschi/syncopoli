@@ -23,8 +23,12 @@ public class BackupSyncOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("drop table " + BackupSyncSchema.TABLE_NAME + ";");
-        onCreate(db);
+        if (oldVersion == 2) {
+            db.execSQL("alter table " + BackupSyncSchema.TABLE_NAME + " add column " + BackupSyncSchema.COLUMN_RSYNC_OPTIONS + " text;");
+        } else {
+            db.execSQL("drop table " + BackupSyncSchema.TABLE_NAME + ";");
+            onCreate(db);
+        }
     }
 
     @Override
