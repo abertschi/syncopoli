@@ -264,14 +264,13 @@ public class BackupHandler implements IBackupHandler {
                 return -1;
             }
 
-            // make sure private_key is readable
-            File pkey_file = new File(private_key);
             if (protocol.equals("SSH")) {
-                if (pkey_file.equals("")) {
+                if (private_key.equals("")) {
                     logFile.write("ERROR: private key not specified with ssh protocol".getBytes());
                     return -1;
                 }
 
+                File pkey_file = new File(private_key);
                 if (!pkey_file.canRead()) {
                     logFile.write(("ERROR: Cannot read private key file: '" + private_key + "'").getBytes());
                     return -1;
