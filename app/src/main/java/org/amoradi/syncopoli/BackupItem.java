@@ -29,18 +29,22 @@ class BackupItem implements Parcelable {
 	}
 
 	public void writeToParcel(Parcel out, int flags) {
-		out.writeString(name);
-		out.writeString(source);
-		out.writeString(destination);
-		out.writeString(logFileName);
+        out.writeString(name);
+        out.writeString(source);
+        out.writeString(destination);
+        out.writeString(logFileName);
 
-		Format ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Format ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-		try {
-			out.writeString(ft.format(lastUpdate));
-		} catch (IllegalArgumentException e) {
-			out.writeString(ft.format(new Date()));
-		}
+        // blame this code on the idiosyncracies of java and their
+        // multitude of similarly sounding, but not-quite-the-same
+        // exceptions
+        // If you have a better way to do this, patches welcome
+        if (lastUpdate != null && (lastUpdate instanceof Date)) {
+            out.writeString(ft.format(lastUpdate));
+        } else {
+            out.writeString(ft.format(new Date()));
+        }
 
 		if (direction == Direction.OUTGOING) {
 			out.writeString("OUTGOING");
