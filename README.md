@@ -73,3 +73,4 @@ Translators
 * Japanese - [naofum](https://gitlab.com/u/naofumi)
 * Russian - [ashed](https://gitlab.com/u/ashed)
 * German - [Christian](https://gitlab.com/u/epinez)
+* Italian - [Claudio Arseni](https://gitlab.com/Claudinux)
