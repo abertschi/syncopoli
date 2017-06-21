@@ -1,0 +1,53 @@
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation">
+
+    <string name="app_name">Syncopoli</string>
+    <string name="action_settings">Impostazioni</string>
+
+    <string name="backup_title">Backup</string>
+    <string name="settings_title">Impostazioni</string>
+    <string name="action_run_backup">Esegui backup</string>
+
+    <string name="addbackupitem_name">Nome profilo</string>
+    <string name="addbackupitem_origin">Origine</string>
+    <string name="addbackupitem_destination">Destinazione</string>
+    <string name="addbackupitem_rsync_options">Opzioni di rsync aggiuntive</string>
+    <string name="addbackupitem_frequency">Frequenza (in ore)</string>
+    <string name="addbackupitem_direction_prompt">Direzione del backup</string>
+    <string-array name="addbackupitem_direction_entries">
+        <item>Da remoto a locale</item>
+        <item>Da locale a remoto</item>
+    </string-array>
+
+    <!-- Action bar icons -->
+    <string name="action_refresh">Aggiorna</string>
+    <string name="action_done">Fatto</string>
+    <string name="action_run">Esegui tutti i backup</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- General settings -->
+    <string name="pref_header_general">Generali</string>
+    <string name="pref_title_server_address">Indirizzo del server</string>
+    <string name="pref_title_private_key">File della chiave privata</string>
+    <string name="pref_title_username">Utente</string>
+    <string name="pref_title_options">Opzioni aggiuntive</string>
+    <string name="pref_title_protocol">Protocollo</string>
+    <string name="pref_default_protocol">Rsync</string>
+    <string name="pref_title_port">Porta</string>
+    <string name="pref_title_frequency">Frequenza (ore)</string>
+    <string name="pref_title_rsync_password">Password di rsync</string>
+    <string name="pref_title_wifi_only">Solo su Wi-Fi</string>
+    
+    <string-array name="pref_entries_protocol">
+        <item>SSH</item>
+        <item>Rsync</item>
+    </string-array>
+
+    <string name="pref_category_general">Generali</string>
+    <string name="pref_category_sync_backup">Sincronizzazione e backup</string>
+
+    <string name="pref_sum_wifi_only">L'elaborazione della sincronizzazione richiederà una connessione Wi-Fi</string>
+    <string name="pref_sum_no_wifi_only">L'elaborazione della sincronizzazione funzionerà su ogni connessione (inclusa la rete mobile)</string>
+</resources>
