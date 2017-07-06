@@ -25,7 +25,7 @@
     <!-- General settings -->
     <string name="pref_header_general">Allgemein</string>
     <string name="pref_title_server_address">Serveradresse</string>
-    <string name="pref_title_private_key">Privater Schlüssel</string>
+    <string name="pref_title_private_key">Private Schlüsseldatei</string>
     <string name="pref_title_username">Benutzer</string>
     <string name="pref_title_options">Zusätzliche Optionen</string>
     <string name="pref_title_protocol">Protokoll</string>
