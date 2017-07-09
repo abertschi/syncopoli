@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-import org.apache.tools.ant.taskdefs.condition.Os
 
 android {
     compileSdkVersion 25
@@ -13,8 +12,14 @@ android {
         versionName "v0.3.3"
         vectorDrawables.useSupportLibrary = true
 
+        externalNativeBuild {
+            ndkBuild {
+                targets 'rsync', 'ssh'
+            }
+        }
+
         ndk {
-            abiFilters 'armeabi', 'armeabi-v7a'
+            abiFilters 'armeabi'
         }
     }
 
@@ -40,38 +45,6 @@ android {
     sourceSets.main {
         jni.srcDirs = []
     }
-
-    Properties properties = new Properties()
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-    task ndkBuild(type: Exec) {
-        def ndkDirProperty = properties.getProperty('ndk.dir')
-        def ndkDirPrefix = ndkDirProperty != null ? ndkDirProperty + '/' : ''
-
-        def ndkBuildExt = Os.isFamily(Os.FAMILY_WINDOWS) ? ".cmd" : ""
-
-        commandLine "${ndkDirPrefix}ndk-build${ndkBuildExt}", '-C', file('src/main').absolutePath,
-				'-j', Runtime.runtime.availableProcessors()
-    }
-
-    tasks.withType(JavaCompile) {
-        compileTask -> compileTask.dependsOn ndkBuild
-    }
-
-    // Cleanup task to remove previously generated binaries
-    task ndkClean(type: Exec) {
-        def ndkDirProperty = properties.getProperty('ndk.dir')
-        def ndkDirPrefix = ndkDirProperty != null ? ndkDirProperty + '/' : ''
-
-        def ndkBuildExt = Os.isFamily(Os.FAMILY_WINDOWS) ? ".cmd" : ""
-
-        commandLine "${ndkDirPrefix}ndk-build${ndkBuildExt}", '-C', file('src/main').absolutePath, 'clean'
-    }
-
-    tasks.withType(Delete) {
-        cleanTask -> cleanTask.dependsOn ndkClean
-    }
-
 }
 
 dependencies {
