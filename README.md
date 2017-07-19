@@ -74,3 +74,4 @@ Translators
 * Russian - [ashed](https://gitlab.com/u/ashed)
 * German - [Christian](https://gitlab.com/u/epinez)
 * Italian - [Claudio Arseni](https://gitlab.com/Claudinux)
+* Dutch - [Nathan van Beelen](https://gitlab.com/nvbln)
