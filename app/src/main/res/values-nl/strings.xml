@@ -1,0 +1,53 @@
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation">
+
+    <string name="app_name">Syncopoli</string>
+    <string name="action_settings">Instellingen</string>
+
+    <string name="backup_title">Backup</string>
+    <string name="settings_title">Instellingen</string>
+    <string name="action_run_backup">Backup uitvoeren</string>
+
+    <string name="addbackupitem_name">Profielnaam</string>
+    <string name="addbackupitem_origin">Afkomst</string>
+    <string name="addbackupitem_destination">Destinatie</string>
+    <string name="addbackupitem_rsync_options">Additionele rsync opties</string>
+    <string name="addbackupitem_frequency">Frequentie (in uren)</string>
+    <string name="addbackupitem_direction_prompt">Backup richting</string>
+    <string-array name="addbackupitem_direction_entries">
+        <item>Afgelegen naar lokaal</item>
+        <item>Lokaal naar afgelegen</item>
+    </string-array>
+
+    <!-- Action bar icons -->
+    <string name="action_refresh">Vernieuwen</string>
+    <string name="action_done">Klaar</string>
+    <string name="action_run">Alle backups uitvoeren</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- General settings -->
+    <string name="pref_header_general">Algemeen</string>
+    <string name="pref_title_server_address">Server adres</string>
+    <string name="pref_title_private_key">Privésleutel Bestand</string>
+    <string name="pref_title_username">Gebruiker</string>
+    <string name="pref_title_options">Additionele Options</string>
+    <string name="pref_title_protocol">Protocol</string>
+    <string name="pref_default_protocol">Rsync</string>
+    <string name="pref_title_port">Poort</string>
+    <string name="pref_title_frequency">Frequentie (uren)</string>
+    <string name="pref_title_rsync_password">Rsync Wachtwoord</string>
+    <string name="pref_title_wifi_only">Alleen met Wifi</string>
+    
+    <string-array name="pref_entries_protocol">
+        <item>SSH</item>
+        <item>Rsync</item>
+    </string-array>
+
+    <string name="pref_category_general">Algemeen</string>
+    <string name="pref_category_sync_backup">Sync &amp; Backup</string>
+
+    <string name="pref_sum_wifi_only">Sync zal Wifi connectie nodig hebben om verder te gaan</string>
+    <string name="pref_sum_no_wifi_only">Sync zal op elke netwerk connectie doorgaan (inclusief mobiele data)</string>
+</resources>
