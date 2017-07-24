@@ -9,10 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
 import android.support.design.widget.Snackbar;
@@ -22,15 +20,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.io.DataOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
-
-import javax.net.ssl.HttpsURLConnection;
 
 public class BackupActivity extends AppCompatActivity implements IBackupHandler {
     private static final String TAG = "BackupActivity";
@@ -51,14 +45,11 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 
     Perm[] mPerms = {
         new Perm(android.Manifest.permission.READ_EXTERNAL_STORAGE, 1),
-        new Perm(android.Manifest.permission.INTERNET, 2),
-        // new Perm(android.Manifest.permission.AUTHENTICATE_ACCOUNTS, 3),
-        new Perm(android.Manifest.permission.READ_SYNC_SETTINGS, 4),
-        new Perm(android.Manifest.permission.WRITE_SYNC_SETTINGS, 5),
-        new Perm(android.Manifest.permission.READ_SYNC_SETTINGS, 6),
-        new Perm(android.Manifest.permission.WAKE_LOCK, 7),
-        new Perm(android.Manifest.permission.ACCESS_NETWORK_STATE, 8),
-        new Perm(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, 9)
+        new Perm(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, 2),
+        new Perm(android.Manifest.permission.READ_SYNC_SETTINGS, 3),
+        new Perm(android.Manifest.permission.WRITE_SYNC_SETTINGS, 4),
+        new Perm(android.Manifest.permission.INTERNET, 5),
+        new Perm(android.Manifest.permission.ACCESS_NETWORK_STATE, 6)
     };
 
     Account mAccount;
@@ -260,95 +251,21 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
             return;
         }
 
-        new DownloadBinaryTask(this).execute(filename);
-    }
+        try {
+            // TODO: copy abi-compatible binaries
+            InputStream src = getAssets().open("armeabi/" + filename);
+            OutputStream dst = new DataOutputStream(openFileOutput(filename, Context.MODE_PRIVATE));
 
-    private class DownloadBinaryTask extends AsyncTask<String, Void, String> {
-
-        private Context context;
-        private PowerManager.WakeLock mWakeLock;
-        private String filePath;
-
-        public DownloadBinaryTask(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected String doInBackground(String... filenames) {
-            InputStream input = null;
-            OutputStream output = null;
-            HttpsURLConnection connection = null;
-
-            try {
-                URL url = new URL("https://amoradi.org/public/android/arm/" + filenames[0]);
-                filePath = context.getFileStreamPath(filenames[0]).getAbsolutePath();
-                connection = (HttpsURLConnection) url.openConnection();
-                connection.setSSLSocketFactory(new TLSSocketFactory());
-                connection.connect();
-
-                // expect HTTP 200 OK, so we don't mistakenly save error report
-                // instead of the file
-                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                    return "Server returned HTTP " + connection.getResponseCode()
-                            + " " + connection.getResponseMessage();
-                }
-
-                // download the file
-                input = connection.getInputStream();
-                output = context.openFileOutput(filenames[0], Context.MODE_PRIVATE);
-
-                byte data[] = new byte[4096];
-                int count;
-                while ((count = input.read(data)) != -1) {
-                    // allow canceling with back button
-                    if (isCancelled()) {
-                        input.close();
-                        File f = new File(filePath);
-                        f.delete();
-                        return null;
-                    }
-                    output.write(data, 0, count);
-                }
-            } catch (Exception e) {
-                return e.toString();
-            } finally {
-                try {
-                    if (output != null)
-                        output.close();
-                    if (input != null)
-                        input.close();
-                } catch (IOException ignored) {
-                }
-
-                if (connection != null)
-                    connection.disconnect();
+            byte data[] = new byte[4096];
+            int count;
+            while ((count = src.read(data)) != -1) {
+                dst.write(data, 0, count);
             }
-            return null;
-        }
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // take CPU lock to prevent CPU from going off if the user
-            // presses the power button during download
-            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-            mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                    getClass().getName());
-            mWakeLock.acquire();
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            mWakeLock.release();
-
-            if (result != null) {
-                Toast.makeText(context, "Download Error: " + result, Toast.LENGTH_LONG).show();
-                File f = new File(filePath);
-                f.delete();
-            } else {
-                File f = new File(filePath);
-                f.setExecutable(true);
-            }
+            src.close();
+            dst.close();
+        } catch (Exception e) {
+            Toast.makeText(this, "Download Error: " + e.toString(), Toast.LENGTH_LONG).show();
         }
     }
 }
