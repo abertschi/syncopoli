@@ -11,14 +11,87 @@ android {
         versionCode 7
         versionName "v0.3.3"
         vectorDrawables.useSupportLibrary = true
+
+        externalNativeBuild {
+            ndkBuild {
+                targets 'rsync', 'ssh'
+                // arguments 'NDK_LOG=1'
+            }
+        }
+
+        ndk {
+            abiFilters 'armeabi'
+        }
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/jni/Android.mk'
+        }
+    }
+
+    android {
+        lintOptions {
+            abortOnError false
+        }
+    }
 }
+
+gradle.taskGraph.afterTask { task ->
+	if (task.name == "externalNativeBuildRelease") {
+		def src = rootProject.file('app/build/intermediates/ndkBuild/release/obj/local/')
+		def dst = rootProject.file('app/src/main/assets/')
+
+		copy {
+			from(src) {
+				exclude "**/objs"
+				exclude "**/*.a"
+				exclude "**/*.o"
+				exclude "**/*.d"
+			}
+			
+			into dst
+
+			eachFile {
+				println "copying " + it.getPath() + " to assets directory"
+			}
+		}
+
+	}
+}
+		
+
+// build.dependsOn reorderTasks
+
+// tasks.withType(PackageApplication) { t ->
+// 	t.dependsOn(copyBins2)
+// }
+
+// app:packageRelease.dependsOn(copyBins2)
+// buildNative.mustRunAft
+
+// assemble.dependsOn copyBins2
+// com.android.build.gradle.tasks.PackageApplication.dependsOn(copyBins2)
+
+// assembleDebug.dependsOn copyBins
+// assembleRelease.dependsOn copyBins
+
+// gradle.buildFinished {
+// 	task ndkCopy(type: Exec) {
+// 		def binDir = rootProject.file("app/build/intermediates/ndkBuild/release/obj/local")
+// 		def assetsDir = rootProject.file("app/src/main/assets/")
+
+// 		println "copying stuff"
+// 		commandLine 'cp', '-r', binDir, assetsDir
+// 	}
+// }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])

@@ -48,6 +48,6 @@
     <string name="pref_category_general">Generali</string>
     <string name="pref_category_sync_backup">Sincronizzazione e backup</string>
 
-    <string name="pref_sum_wifi_only">L'elaborazione della sincronizzazione richiederà una connessione Wi-Fi</string>
-    <string name="pref_sum_no_wifi_only">L'elaborazione della sincronizzazione funzionerà su ogni connessione (inclusa la rete mobile)</string>
+    <string name="pref_sum_wifi_only">L\'elaborazione della sincronizzazione richiederà una connessione Wi-Fi</string>
+    <string name="pref_sum_no_wifi_only">L\'elaborazione della sincronizzazione funzionerà su ogni connessione (inclusa la rete mobile)</string>
 </resources>
