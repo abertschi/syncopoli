@@ -1,6 +1,3 @@
-[submodule "app/src/main/jni/android_external_dropbear"]
-	path = app/src/main/jni/android_external_dropbear
-	url = https://github.com/fengshaun/android_external_dropbear
 [submodule "app/src/main/jni/android_external_rsync"]
 	path = app/src/main/jni/android_external_rsync
 	url = https://github.com/fengshaun/android_external_rsync
