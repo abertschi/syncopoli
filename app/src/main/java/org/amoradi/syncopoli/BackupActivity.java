@@ -264,6 +264,9 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 
             src.close();
             dst.close();
+
+	    File f = new File(getFilesDir(), filename);
+	    f.setExecutable(true);
         } catch (Exception e) {
             Toast.makeText(this, "Download Error: " + e.toString(), Toast.LENGTH_LONG).show();
         }

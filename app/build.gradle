@@ -45,7 +45,7 @@ android {
 }
 
 gradle.taskGraph.afterTask { task ->
-	if (task.name == "externalNativeBuildRelease") {
+	if (task.name == "externalNativeBuildRelease" || task.name == "externalNativeBuildDebug") {
 		def src = rootProject.file('app/build/intermediates/ndkBuild/release/obj/local/')
 		def dst = rootProject.file('app/src/main/assets/')
 
@@ -67,32 +67,6 @@ gradle.taskGraph.afterTask { task ->
 	}
 }
 		
-
-// build.dependsOn reorderTasks
-
-// tasks.withType(PackageApplication) { t ->
-// 	t.dependsOn(copyBins2)
-// }
-
-// app:packageRelease.dependsOn(copyBins2)
-// buildNative.mustRunAft
-
-// assemble.dependsOn copyBins2
-// com.android.build.gradle.tasks.PackageApplication.dependsOn(copyBins2)
-
-// assembleDebug.dependsOn copyBins
-// assembleRelease.dependsOn copyBins
-
-// gradle.buildFinished {
-// 	task ndkCopy(type: Exec) {
-// 		def binDir = rootProject.file("app/build/intermediates/ndkBuild/release/obj/local")
-// 		def assetsDir = rootProject.file("app/src/main/assets/")
-
-// 		println "copying stuff"
-// 		commandLine 'cp', '-r', binDir, assetsDir
-// 	}
-// }
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
