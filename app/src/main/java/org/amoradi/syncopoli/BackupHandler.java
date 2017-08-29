@@ -58,7 +58,7 @@ public class BackupHandler implements IBackupHandler {
         values.put(BackupSyncSchema.COLUMN_NAME, item.name);
         values.put(BackupSyncSchema.COLUMN_SOURCE, item.source);
         values.put(BackupSyncSchema.COLUMN_DESTINATION, item.destination);
-        values.put(BackupSyncSchema.COLUMN_RSYNC_OPTIONS, "");
+        values.put(BackupSyncSchema.COLUMN_RSYNC_OPTIONS, item.rsync_options);
         values.put(BackupSyncSchema.COLUMN_LAST_UPDATE, "");
 
         if (item.direction == BackupItem.Direction.INCOMING) {
