@@ -48,11 +48,10 @@ public class BackupBackgroundService extends IntentService {
 			.setVibrate(null)
 			.setAutoCancel(true)
 			.setSmallIcon(R.drawable.ic_action_refresh)
-			.setAutoCancel()
 			.build();
 
 		NotificationManager notifyMan = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-		notifyMan.notify(NOTIFICATION_ID, notif.build());
+		notifyMan.notify(NOTIFICATION_ID, notif);
 	}
     }
 }

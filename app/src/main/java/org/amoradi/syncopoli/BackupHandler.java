@@ -247,6 +247,8 @@ public class BackupHandler implements IBackupHandler {
 
             String rsync_options = prefs.getString(SettingsFragment.KEY_RSYNC_OPTIONS, "");
             String rsync_password = prefs.getString(SettingsFragment.KEY_RSYNC_PASSWORD, "");
+            String ssh_password = prefs.getString(SettingsFragment.KEY_SSH_PASSWORD, "");
+            Boolean use_ssh_password = false;
 
             String server_address = prefs.getString(SettingsFragment.KEY_SERVER_ADDRESS, "");
 
@@ -266,13 +268,18 @@ public class BackupHandler implements IBackupHandler {
 
             if (protocol.equals("SSH")) {
                 if (private_key.equals("")) {
-                    logFile.write("ERROR: private key not specified with ssh protocol".getBytes());
-                    return -1;
+                    use_ssh_password = true;
+                } else {
+                    File pkey_file = new File(private_key);
+                    if (!pkey_file.canRead()) {
+                        logFile.write(("ERROR: Cannot read specified private key file: '" + private_key + "'").getBytes());
+                        return -1;
+                    }
+                    use_ssh_password = false;
                 }
 
-                File pkey_file = new File(private_key);
-                if (!pkey_file.canRead()) {
-                    logFile.write(("ERROR: Cannot read private key file: '" + private_key + "'").getBytes());
+                if (ssh_password.equals("") && use_ssh_password) {
+                    logFile.write(("ERROR: attempting to use password, but no password specified for SSH").getBytes());
                     return -1;
                 }
             }
@@ -294,13 +301,13 @@ public class BackupHandler implements IBackupHandler {
             }
 
             if (protocol.equals("SSH")) {
-                if (private_key.equals("")) {
-                    logFile.write("ERROR: Private key is not specified while SSH protocol is in use.".getBytes());
-                    return -1;
+                if (use_ssh_password) {
+                    args.add("-e");
+                    args.add(sshPath + " -y -p " + port);
+                } else {
+                    args.add("-e");
+                    args.add(sshPath + " -y -p " + port + " -i " + private_key);
                 }
-
-                args.add("-e");
-                args.add(sshPath + " -y -p " + port + " -i " + private_key);
 
                 if (b.direction == BackupItem.Direction.OUTGOING) {
                     args.add(b.source);
@@ -334,6 +341,10 @@ public class BackupHandler implements IBackupHandler {
 
             if (protocol.equals("Rsync") && !rsync_password.equals("")) {
                 env.put("RSYNC_PASSWORD", rsync_password);
+            }
+
+            if (protocol.equals("SSH") && use_ssh_password) {
+                env.put("DROPBEAR_PASSWORD", ssh_password);
             }
 
             /*

@@ -73,6 +73,15 @@
             android:title="@string/pref_title_rsync_password" />
 
         <EditTextPreference
+            android:defaultValue=""
+            android:inputType="textPassword"
+            android:key="pref_key_ssh_password"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/pref_title_ssh_password" />
+
+        <EditTextPreference
             android:defaultValue="8"
             android:inputType="number"
             android:key="pref_key_frequency"

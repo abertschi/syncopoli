@@ -38,6 +38,7 @@
     <string name="pref_title_port">Port</string>
     <string name="pref_title_frequency">Frequency (hours)</string>
     <string name="pref_title_rsync_password">Rsync Password</string>
+    <string name="pref_title_ssh_password">SSH Password</string>
     <string name="pref_title_wifi_only">Wifi only</string>
     
     <string-array name="pref_entries_protocol">
