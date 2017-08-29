@@ -36,24 +36,23 @@ public class BackupBackgroundService extends IntentService {
 	}
 
     private void runTask(BackupItem b) {
-        Notification notif = new NotificationCompat.Builder(getApplicationContext())
-                .setContentTitle("Syncopoli")
-                .setContentText("Syncing " + b.name)
-                .setTicker("Notification!")
-                .setWhen(System.currentTimeMillis())
-                .setSound(null)
-                .setVibrate(null)
-                .setAutoCancel(true)
-                .setSmallIcon(R.drawable.ic_action_refresh)
-                .build();
-
-        NotificationManager notifyMan = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-        notifyMan.notify(NOTIFICATION_ID, notif);
 
         BackupHandler h = new BackupHandler(getApplicationContext());
-        h.runBackup(b);
+        if (h.runBackup(b) != 0) {
+		Notification notif = new NotificationCompat.Builder(getApplicationContext())
+			.setContentTitle("Syncopoli")
+			.setContentText("Syncing " + b.name + " failed.")
+			.setTicker("Notification!")
+			.setWhen(System.currentTimeMillis())
+			.setSound(null)
+			.setVibrate(null)
+			.setAutoCancel(true)
+			.setSmallIcon(R.drawable.ic_action_refresh)
+			.setAutoCancel()
+			.build();
 
-
-        notifyMan.cancel(NOTIFICATION_ID);
+		NotificationManager notifyMan = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+		notifyMan.notify(NOTIFICATION_ID, notif.build());
+	}
     }
 }
