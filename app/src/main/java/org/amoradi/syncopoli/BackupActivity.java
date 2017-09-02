@@ -11,11 +11,13 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.LayoutRes;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -23,8 +25,14 @@ import android.widget.Toast;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.List;
+
+import org.json.*;
 
 public class BackupActivity extends AppCompatActivity implements IBackupHandler {
     private static final String TAG = "BackupActivity";
@@ -161,12 +169,103 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
             syncBackups();
         } else if (id == R.id.menu_settings) {
             setCurrentFragment(new SettingsFragment(), true);
+		} else if (id == R.id.menu_export) {
+			exportProfiles();
+		} else if (id == R.id.menu_import) {
+			importProfiles();
         } else {
             return super.onOptionsItemSelected(item);
         }
 
         return true;
     }
+
+	public int exportProfiles() {
+		List<BackupItem> backups = mBackupHandler.getBackups();
+		
+		JSONArray profiles = new JSONArray();
+
+		try {
+			for (BackupItem i : backups) {
+				JSONObject p = new JSONObject();
+				p.put("name", i.name);
+				p.put("source", i.source);
+				p.put("destination", i.destination);
+				p.put("rsync_options", i.rsync_options);
+
+				if (i.direction == BackupItem.Direction.INCOMING) {
+					p.put("direction", "INCOMING");
+				} else {
+					p.put("direction", "OUTGOING");
+				}
+
+				profiles.put(p);
+			}
+		} catch (JSONException e) {
+			Log.e(TAG, "ERROR exporting profiles: " + e.getMessage());
+		}
+
+		try {
+			File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "syncopoli_export.json");
+			FileOutputStream s = new FileOutputStream(f);
+			s.write(profiles.toString().getBytes());
+			s.close();
+		} catch (IOException e) {
+			Log.e(TAG, "ERROR exporting profiles: " + e.getMessage());
+		}
+		
+		return 0;
+	}
+
+	public int importProfiles() {
+		File f;
+		FileInputStream s;
+		try {
+			f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/syncopoli_export.json");
+			s = new FileInputStream(f);
+		} catch (FileNotFoundException e) {
+			Log.e(TAG, "ERROR importing profiles: " + e.getMessage());
+			return -1;
+		}
+
+
+		byte[] buffer = new byte[(int) f.length()];
+
+		int read = 0;
+		int tmpRead = 0;
+
+		try {
+			s.read(buffer);
+		} catch (IOException e) {
+			Log.e(TAG, "ERROR importing profiles: " + e.getMessage());
+		}
+
+		try {
+			JSONArray profiles = new JSONArray(buffer.toString());
+			for (int i = 0; i < profiles.length(); i++) {
+				JSONObject jb = profiles.getJSONObject(i);
+
+				BackupItem b = new BackupItem();
+				b.name = jb.getString("name");
+				b.source = jb.getString("source");
+				b.destination = jb.getString("destination");
+				b.rsync_options = jb.getString("rsync_options");
+
+				if (jb.getString("direction").equals("INCOMING")) {
+					b.direction = BackupItem.Direction.INCOMING;
+				} else {
+					b.direction = BackupItem.Direction.OUTGOING;
+				}
+
+				mBackupHandler.addBackup(b);
+			}
+		} catch (JSONException e) {
+			Log.e(TAG, "ERROR importing profiles: " + e.getMessage());
+		}
+
+		Toast.makeText(getApplicationContext(), "Import successful", Toast.LENGTH_SHORT).show();
+		return 0;
+	}
 
     public int addBackup(BackupItem item) {
         if (mBackupHandler.addBackup(item) == BackupHandler.ERROR_EXISTS) {

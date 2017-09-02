@@ -29,4 +29,16 @@
         android:title="@string/settings_title"
         app:showAsAction="never" />
 
+	<item
+		android:id="@+id/menu_export"
+		android:icon="@drawable/ic_menu_settings"
+		android:title="@string/export_title"
+		app:showAsAction="never" />
+
+	<item
+		android:id="@+id/menu_import"
+		android:icon="@drawable/ic_menu_settings"
+		android:title="@string/import_title"
+		app:showAsAction="never" />
+
 </menu>
