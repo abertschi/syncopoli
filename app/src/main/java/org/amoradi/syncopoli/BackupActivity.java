@@ -22,6 +22,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.InputStream;
@@ -35,7 +37,7 @@ import java.util.List;
 import org.json.*;
 
 public class BackupActivity extends AppCompatActivity implements IBackupHandler {
-    private static final String TAG = "BackupActivity";
+    private static final String TAG = "Syncopoli_BackupActivity";
 
     public static final String SYNC_AUTHORITY = "org.amoradi.syncopoli.provider";
     public static final String SYNC_ACCOUNT_NAME = "Syncopoli Sync Account";
@@ -202,48 +204,55 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 				profiles.put(p);
 			}
 		} catch (JSONException e) {
-			Log.e(TAG, "ERROR exporting profiles: " + e.getMessage());
+			Log.e(TAG, "ERROR exporting profiles while creating json object: " + e.getMessage());
+			return -1;
 		}
 
 		try {
 			File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "syncopoli_export.json");
+			Log.v(TAG, "export file path: " + f.getAbsolutePath());
 			FileOutputStream s = new FileOutputStream(f);
 			s.write(profiles.toString().getBytes());
 			s.close();
 		} catch (IOException e) {
-			Log.e(TAG, "ERROR exporting profiles: " + e.getMessage());
+			Log.e(TAG, "ERROR exporting profiles while writing: " + e.getMessage());
+			return -1;
 		}
 		
 		return 0;
 	}
 
 	public int importProfiles() {
-		File f;
-		FileInputStream s;
+		String content;
+
 		try {
-			f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "/syncopoli_export.json");
-			s = new FileInputStream(f);
+			File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "syncopoli_export.json");
+			Log.v(TAG, "import file path: " + f.getAbsolutePath());
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+
+            char[] buffer = new char[1024];
+            StringBuilder output = new StringBuilder();
+            while (reader.read(buffer) > 0) {
+                output.append(new String(buffer));
+            }
+            reader.close();
+
+            content = output.toString();
 		} catch (FileNotFoundException e) {
-			Log.e(TAG, "ERROR importing profiles: " + e.getMessage());
+			Log.e(TAG, "ERROR importing profiles while getting input stream: " + e.getMessage());
+			return -1;
+		} catch (IOException e) {
+			Log.e(TAG, "ERROR importing profiles while reading: " + e.getMessage());
 			return -1;
 		}
 
-
-		byte[] buffer = new byte[(int) f.length()];
-
-		int read = 0;
-		int tmpRead = 0;
-
 		try {
-			s.read(buffer);
-		} catch (IOException e) {
-			Log.e(TAG, "ERROR importing profiles: " + e.getMessage());
-		}
-
-		try {
-			JSONArray profiles = new JSONArray(buffer.toString());
+			Log.v(TAG, "profiles: " + content);
+			JSONArray profiles = new JSONArray(content);
 			for (int i = 0; i < profiles.length(); i++) {
+				Log.v(TAG, "processing " + String.valueOf(i));
 				JSONObject jb = profiles.getJSONObject(i);
+				Log.v(TAG, "created json object");
 
 				BackupItem b = new BackupItem();
 				b.name = jb.getString("name");
@@ -260,9 +269,11 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 				mBackupHandler.addBackup(b);
 			}
 		} catch (JSONException e) {
-			Log.e(TAG, "ERROR importing profiles: " + e.getMessage());
+			Log.e(TAG, "ERROR importing profiles while recreating json: " + e.getMessage());
+			return -1;
 		}
 
+		updateBackupList();
 		Toast.makeText(getApplicationContext(), "Import successful", Toast.LENGTH_SHORT).show();
 		return 0;
 	}
@@ -306,6 +317,10 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 
     public void updateBackupList() {
         mBackupHandler.updateBackupList();
+
+        BackupListFragment f = new BackupListFragment();
+        f.setBackupHandler(this);
+        setCurrentFragment(f, true);
     }
 
     public List<BackupItem> getBackups() {
