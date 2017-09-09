@@ -1,3 +1,11 @@
+v0.4.2
+------
+- add import/export
+- fix notification always showing up
+- enable use of password for ssh
+- add account picture for sync account
+- various bug fixes
+
 v0.3.1
 ------
 - fix upgrade from v0.2 to v0.3 deleting profiles
