@@ -210,7 +210,6 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 
 		try {
 			File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "syncopoli_export.json");
-			Log.v(TAG, "export file path: " + f.getAbsolutePath());
 			FileOutputStream s = new FileOutputStream(f);
 			s.write(profiles.toString().getBytes());
 			s.close();
@@ -227,7 +226,6 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 
 		try {
 			File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "syncopoli_export.json");
-			Log.v(TAG, "import file path: " + f.getAbsolutePath());
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
 
             char[] buffer = new char[1024];
@@ -247,12 +245,9 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 		}
 
 		try {
-			Log.v(TAG, "profiles: " + content);
 			JSONArray profiles = new JSONArray(content);
 			for (int i = 0; i < profiles.length(); i++) {
-				Log.v(TAG, "processing " + String.valueOf(i));
 				JSONObject jb = profiles.getJSONObject(i);
-				Log.v(TAG, "created json object");
 
 				BackupItem b = new BackupItem();
 				b.name = jb.getString("name");
