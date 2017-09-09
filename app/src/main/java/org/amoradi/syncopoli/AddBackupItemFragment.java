@@ -56,6 +56,7 @@ public class AddBackupItemFragment extends Fragment {
         v_dst = (TextInputEditText) v.findViewById(R.id.addbackupitem_destination);
         v_opts = (TextInputEditText) v.findViewById(R.id.addbackupitem_rsync_options);
 
+		/*
         v_src.setOnLongClickListener(new View.OnLongClickListener () {
             @Override
             public boolean onLongClick(View v) {
@@ -71,6 +72,7 @@ public class AddBackupItemFragment extends Fragment {
                 return true;
             }
         });
+		*/
 
         MaterialSpinner v_dir = (MaterialSpinner) v.findViewById(R.id.addbackupitem_direction);
         String[] items = getResources().getStringArray(R.array.addbackupitem_direction_entries);
