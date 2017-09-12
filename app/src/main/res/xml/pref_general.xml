@@ -96,6 +96,15 @@
             android:summaryOff="@string/pref_sum_no_wifi_only"
             android:summaryOn="@string/pref_sum_wifi_only" />
 
+        <EditTextPreference
+            android:defaultValue=""
+            android:inputType="text"
+            android:key="pref_key_wifi_name"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/pref_title_wifi_name" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

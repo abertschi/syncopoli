@@ -19,6 +19,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public final static String KEY_RSYNC_PASSWORD = "pref_key_rsync_password";
     public final static String KEY_SSH_PASSWORD = "pref_key_ssh_password";
     public final static String KEY_WIFI_ONLY = "pref_key_wifi_only";
+    public final static String KEY_WIFI_NAME = "pref_key_wifi_name";
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {

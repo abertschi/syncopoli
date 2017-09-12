@@ -9,6 +9,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiInfo;
+import android.net.NetworkInfo.DetailedState;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -389,17 +392,39 @@ public class BackupHandler implements IBackupHandler {
     public boolean canRunBackup() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         boolean wifi_only = prefs.getBoolean(SettingsFragment.KEY_WIFI_ONLY, false);
+        String wifi_name = prefs.getString(SettingsFragment.KEY_WIFI_NAME, "");
 
-        if (wifi_only) {
-            ConnectivityManager connManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if (!wifi_only) {
+            return true;
+        }
 
-            if (!mWifi.isConnected()) {
-                return false;
+        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        if (!wifiManager.isWifiEnabled()) {
+            return false;
+        }
+
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        if (wifiInfo == null) {
+            Log.e("Syncopoli_BackupHandler", "Cannot get Wifi info from WifiManager");
+            return false;
+        }
+
+        DetailedState state = WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState());
+        if (state != DetailedState.CONNECTED) {
+            return false;
+        }
+
+        if (wifi_name.equals("")) {
+	       return true;
+        }
+
+        for (String name : wifi_name.split(";")) {
+            if (wifiInfo.getSSID().equals(wifi_name)) {
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     public void setRunOnWifi(boolean run) {
