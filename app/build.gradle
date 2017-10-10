@@ -46,12 +46,17 @@ android {
 
 gradle.taskGraph.afterTask { task ->
 	if (task.name == "externalNativeBuildRelease" || task.name == "externalNativeBuildDebug") {
-		def src = rootProject.file('app/build/intermediates/ndkBuild/release/obj/local/')
+		def mode = "release"
+		if (task.name == "externalNativeBuildDebug") {
+			mode = "debug"
+		}
+		def src = rootProject.file("app/build/intermediates/ndkBuild/${mode}/obj/local/")
 		def dst = rootProject.file('app/src/main/assets/')
 
 		copy {
 			from(src) {
 				exclude "**/objs"
+				exclude "**/objs-debug"
 				exclude "**/*.a"
 				exclude "**/*.o"
 				exclude "**/*.d"
