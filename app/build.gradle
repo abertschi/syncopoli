@@ -71,6 +71,10 @@ gradle.taskGraph.afterTask { task ->
 
 	}
 }
+
+clean {
+	delete '.externalNativeBuild'
+}
 		
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
