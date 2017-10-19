@@ -356,28 +356,57 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
     public void copyExecutable(String filename) {
         File file = getFileStreamPath(filename);
 
+        // @todo: what about updated native executables?
         if (file.exists()) {
             return;
         }
 
-        try {
-            // TODO: copy abi-compatible binaries
-            InputStream src = getAssets().open("armeabi/" + filename);
-            OutputStream dst = new DataOutputStream(openFileOutput(filename, Context.MODE_PRIVATE));
-
-            byte data[] = new byte[4096];
-            int count;
-            while ((count = src.read(data)) != -1) {
-                dst.write(data, 0, count);
+        String[] abis = {Build.CPU_ABI, Build.CPU_ABI2}; // use Build.SUPPORTED_ABIS from API level 21
+        for (String abi : abis) {
+            // try to grab matching executable for a ABI supported by this device
+            InputStream src;
+            try {
+                src = getAssets().open(abi + '/' + filename);
+            } catch (IOException e) {
+                // no need to close src here
+                continue;
             }
 
-            src.close();
-            dst.close();
+            OutputStream dst = null;
+            try {
+                dst = new DataOutputStream(openFileOutput(filename, Context.MODE_PRIVATE));
 
-	    File f = new File(getFilesDir(), filename);
-	    f.setExecutable(true);
-        } catch (Exception e) {
-            Toast.makeText(this, "Download Error: " + e.toString(), Toast.LENGTH_LONG).show();
+                byte data[] = new byte[4096];
+                int count;
+
+                while ((count = src.read(data)) != -1) {
+                    dst.write(data, 0, count);
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "Error copying executable: " + e.toString());
+                return;
+            } finally {
+                try {
+                    src.close();
+                    if (dst != null) {
+                        dst.close();
+                    }
+                } catch  (IOException e) {
+                    Log.e(TAG, "Error closing input stream: " + e.toString());
+                }
+            }
+
+            File f = new File(getFilesDir(), filename);
+            try {
+                f.setExecutable(true);
+                return;
+            } catch (SecurityException e) {
+                Log.e(TAG, "Error setting executable flag: " + e.toString());
+            }
+
+            // everything went well
+            return;
         }
+        Log.e(TAG, "ERROR selecting native executables for device's ABI");
     }
 }
