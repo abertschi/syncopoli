@@ -45,7 +45,7 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
         @Override
         public boolean onLongClick(View v) {
             if (v instanceof LinearLayout) {
-                final CharSequence[] items = {"Edit Profile", "Delete Profile"};
+                final CharSequence[] items = {"Copy Profile", "Edit Profile", "Delete Profile"};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
@@ -56,6 +56,8 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
                         if (item == 0) {
                             mBackupClickHandler.onBackupEdit(getAdapterPosition());
                         } else if (item == 1) {
+                            mBackupClickHandler.onBackupEdit(getAdapterPosition());
+                        } else if (item == 2) {
                             mBackupClickHandler.onBackupDelete(getAdapterPosition());
                         }
                     }
@@ -116,5 +118,6 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
 
     public void onBackupEdit(int pos) {
         mBackupHandler.editBackup(mBackupHandler.getBackups().get(pos));
+		notifyDataSetChanged();
     }
 }
