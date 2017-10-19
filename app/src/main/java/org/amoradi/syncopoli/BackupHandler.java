@@ -43,7 +43,7 @@ public class BackupHandler implements IBackupHandler {
     }
 
     public int addBackup(BackupItem item) {
-        if (item.source.equals("") || item.name.equals("") || item.destination.equals("")) {
+        if (item.source.equals("") || item.name.equals("")) {
             return -1;
         }
 
