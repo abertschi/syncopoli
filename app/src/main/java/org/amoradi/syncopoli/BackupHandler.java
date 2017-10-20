@@ -11,7 +11,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiInfo;
-import android.net.NetworkInfo.DetailedState;
+import android.net.wifi.SupplicantState;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -409,8 +409,8 @@ public class BackupHandler implements IBackupHandler {
             return false;
         }
 
-        DetailedState state = WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState());
-        if (state != DetailedState.CONNECTED) {
+        SupplicantState state = wifiInfo.getSupplicantState();
+        if (state != SupplicantState.ASSOCIATED) {
             return false;
         }
 
