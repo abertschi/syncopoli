@@ -62,7 +62,7 @@ A: Set your global options by going to `settings` (see `Global Options` above), 
 
 Q: Typing paths is tedious.
 
-A: I know. Just long-press on Origin path. Make sure you have OI File Manager installed.
+A: I know. It's in the works.
 
 Credits
 =======
