@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.ScrollView;
 
 import java.io.BufferedReader;
+import java.io.LineNumberReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.io.InputStreamReader;
 
 public class BackupLogFragment extends Fragment {
     private BackupItem mBackupItem;
+    private int mFileLine;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,7 @@ public class BackupLogFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_backuplog, container, false);
         if (mBackupItem != null) {
+            mFileLine = 0;
             ((TextView) v.findViewById(R.id.backuplog_textview)).setText(getLogString(mBackupItem.logFileName));
         } else {
             ((TextView) v.findViewById(R.id.backuplog_textview)).setText("mBackupItem is null");
@@ -69,12 +72,15 @@ public class BackupLogFragment extends Fragment {
         try {
             FileInputStream ins = getActivity().getApplicationContext().openFileInput(filename);
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ins));
-            char[] buffer = new char[4096];
+            LineNumberReader reader = new LineNumberReader(new InputStreamReader(ins));
+            reader.setLineNumber(mFileLine);
 
             StringBuilder output = new StringBuilder();
-            while (reader.read(buffer) > 0) {
-                output.append(new String(buffer));
+            String line = reader.readLine();
+            while (line != null) {
+                output.append(line);
+                mFileLine = reader.getLineNumber();
+                line = reader.readLine();
             }
             reader.close();
             ins.close();
