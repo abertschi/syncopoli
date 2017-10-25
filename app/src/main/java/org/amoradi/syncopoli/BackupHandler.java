@@ -410,7 +410,7 @@ public class BackupHandler implements IBackupHandler {
         }
 
         SupplicantState state = wifiInfo.getSupplicantState();
-        if (state != SupplicantState.ASSOCIATED) {
+        if (state != SupplicantState.COMPLETED) {
             return false;
         }
 
