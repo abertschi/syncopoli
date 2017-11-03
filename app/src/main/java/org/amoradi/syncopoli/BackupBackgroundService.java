@@ -1,5 +1,7 @@
 package org.amoradi.syncopoli;
 
+import java.util.Date;
+
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -10,8 +12,6 @@ import android.os.Parcelable;
 import android.support.v7.app.NotificationCompat;
 
 public class BackupBackgroundService extends IntentService {
-	private int NOTIFICATION_ID = 2;
-
     public BackupBackgroundService() {
         super("BackupBackgroundService");
         setIntentRedelivery(true);
@@ -51,7 +51,9 @@ public class BackupBackgroundService extends IntentService {
 			.build();
 
 		NotificationManager notifyMan = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-		notifyMan.notify(NOTIFICATION_ID, notif);
+
+		int m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
+		notifyMan.notify(m, notif);
 	}
     }
 }
