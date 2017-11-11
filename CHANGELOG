@@ -1,3 +1,11 @@
+v0.4.3
+------
+- add x86 support
+- fix wifi detection
+- fix notification overlap
+- syncopoli now supports >2GB files
+- add syncs over specific wifi SSIDs
+
 v0.4.2
 ------
 - add import/export
