@@ -8,15 +8,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
-import java.io.BufferedReader;
-import java.io.LineNumberReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 
 public class BackupLogFragment extends Fragment {
     private BackupItem mBackupItem;
@@ -78,7 +77,7 @@ public class BackupLogFragment extends Fragment {
             StringBuilder output = new StringBuilder();
             String line = reader.readLine();
             while (line != null) {
-                output.append(line);
+                output.append(line + "\n");
                 mFileLine = reader.getLineNumber();
                 line = reader.readLine();
             }
