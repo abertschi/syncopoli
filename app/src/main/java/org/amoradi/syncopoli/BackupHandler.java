@@ -5,13 +5,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.wifi.SupplicantState;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.SupplicantState;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -418,8 +416,13 @@ public class BackupHandler implements IBackupHandler {
 	       return true;
         }
 
+        String ssid = wifiInfo.getSSID();
+        if (ssid.startsWith("\"")) {
+            ssid = ssid.replaceAll("^\"|\"$", "");
+        }
+
         for (String name : wifi_name.split(";")) {
-            if (wifiInfo.getSSID().equals(wifi_name)) {
+            if (ssid.equals(name)) {
                 return true;
             }
         }
