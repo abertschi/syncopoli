@@ -9,10 +9,13 @@ Global Options
 * Protocol - Rsync or SSH
 * Port - Port where rsync or ssh daemon is listening
 * User - This should be your rsync user or ssh user (depending on protocol)
-* Additional Options - Any additional options you want to give rsync
+* Additional Options - Any additional options you want to give rsync. This is applied to all sync profiles.
 * Private key - Should be your dropbear-compatible ssh key (see below)
 * Rsync Password - password used to authenticate with the Rsync daemon
+* SSH Password - password used to authenticate using ssh protocol
 * Frequency - How often you want to run all the sync profiles (in hours)
+* Wifi only - whether to sync over wifi only
+* SSIDs to sync - sync only when connected to the specified SSIDs, e.g. mynetwork;yournetwork;somenetwork
 
 Profile Options
 ---------------
@@ -28,7 +31,7 @@ Syncopoli requires a dropbear-compatible ssh key. You can use `dropbearconvert` 
 
 External binaries
 -----------------
-`rsync` and `ssh` (dropbear ssh) binaries are included here and are themselves open source projects. The sources for these binaries have not been modified.
+`rsync` and `ssh` (dropbear ssh) binaries are built from source on f-droid servers. Cloning this project will include ALL sources used (and their modifications).
 
 Interoperability
 ----------------
@@ -49,12 +52,19 @@ org.amoradi.syncopoli.SYNC_PROFILE
 
 I expect the user of your application will set the profile name as has been setup in syncopoli.
 
+Building
+--------
+See `app/build.gradle` for dependencies (requires android `sdk` and `ndk`, make sure to properly set up both).
+
+```
+$ git clone --recursive
+$ gradle build
+```
+
+You have to have `gradle` installed. See [gradle.org](https://gradle.org) or your local fresh repo.
+
 FAQ
 ---
-
-Q: Why is Syncopoli making connections to `<someservername>`?
-
-A: Syncopoli needs `rsync` and `ssh` (dropbearssh) to operate. Since F-Droid does not allow bundling of binary files, I have hosted them on `<someservername>` and download those two when you first run the program. If you don't trust the binaries and have your phone rooted, just put `rsync` and `ssh` binaries that you have compiled yourself in `/data/data/org.amoradi.syncopoli/files` and Syncopoli will use those ones instead (make sure to set them as executables).
 
 Q: How do I use this...thing?
 
