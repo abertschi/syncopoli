@@ -3,5 +3,5 @@
 APP_SHORT_COMMANDS := true
 
 # armeabi is deprecated
-APP_ABI := armeabi-v7a x86
+APP_ABI := armeabi-v7a x86 arm64-v8a
 APP_PLATFORM := android-16
