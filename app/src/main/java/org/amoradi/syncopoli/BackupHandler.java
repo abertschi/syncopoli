@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -179,7 +180,7 @@ public class BackupHandler implements IBackupHandler {
                 x.lastUpdate = null;
             }
 
-            x.logFileName = "log_" + x.name.replace(" ", "_");
+            x.logFileName = Uri.encode("log_" + x.name);
             bl.add(x);
         } while(c.moveToNext());
 
