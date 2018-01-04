@@ -38,7 +38,9 @@ public class BackupBackgroundService extends IntentService {
     private void runTask(BackupItem b) {
 
         BackupHandler h = new BackupHandler(getApplicationContext());
-        if (h.runBackup(b) != 0) {
+	int ret = h.runBackup(b);
+
+        if (ret != 0 && ret != BackupHandler.ERROR_DONOTRUN) {
 		Notification notif = new NotificationCompat.Builder(getApplicationContext())
 			.setContentTitle("Syncopoli")
 			.setContentText("Syncing " + b.name + " failed.")

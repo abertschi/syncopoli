@@ -30,7 +30,7 @@ public class BackupHandler implements IBackupHandler {
     private List<BackupItem> mBackupItems;
     Context mContext;
 
-    public static final int ERROR_NO_WIFI = -2;
+    public static final int ERROR_DONOTRUN = -2;
     public static final int ERROR_EXISTS = -3;
     public static final int ERROR_MISSING = -4;
     public static final int ERROR_TOO_MANY_RESULTS = -5;
@@ -225,7 +225,7 @@ public class BackupHandler implements IBackupHandler {
 
     public int runBackup(BackupItem b) {
         if (!canRunBackup()) {
-            return ERROR_NO_WIFI;
+            return ERROR_DONOTRUN;
         }
 
         try {
