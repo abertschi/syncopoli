@@ -76,6 +76,19 @@ public class BackupHandler implements IBackupHandler {
         return 0;
     }
 
+    public int copyBackup(BackupItem item) {
+        int n = 1;
+        String name;
+        do {
+            name = item.name + " - copy " + Integer.toString(n++);
+        } while (findBackup(name) != null);
+
+        item.name = name;
+        addBackup(item);
+
+        return 0;
+    }
+
     public int removeBackup(BackupItem item) {
         BackupSyncOpenHelper dbHelper = new BackupSyncOpenHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();

@@ -6,6 +6,7 @@ public interface IBackupHandler {
     int addBackup(BackupItem bi);
     int removeBackup(BackupItem bi);
     int editBackup(BackupItem bi);
+    int copyBackup(BackupItem bi);
     int updateBackup(BackupItem bi);
     int runBackup(BackupItem bi);
     void showLog(BackupItem bi);

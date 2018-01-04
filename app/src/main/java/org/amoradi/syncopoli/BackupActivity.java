@@ -303,6 +303,15 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         return ret;
     }
 
+    public int copyBackup(BackupItem item) {
+        int ret = mBackupHandler.copyBackup(item);
+        if (ret == 0) {
+            mBackupHandler.updateBackupList();
+        }
+
+        return ret;
+    }
+
     public int editBackup(BackupItem item) {
         AddBackupItemFragment f = new AddBackupItemFragment();
         f.setBackupContent(item);

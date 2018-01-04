@@ -120,4 +120,9 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
         mBackupHandler.editBackup(mBackupHandler.getBackups().get(pos));
 		notifyDataSetChanged();
     }
+
+    public void onBackupCopy(int pos) {
+        mBackupHandler.copyBackup(mBackupHandler.getBackups().get(pos));
+        notifyDataSetChanged();
+    }
 }
