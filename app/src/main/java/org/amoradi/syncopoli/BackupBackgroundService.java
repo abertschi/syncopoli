@@ -37,25 +37,28 @@ public class BackupBackgroundService extends IntentService {
 
     private void runTask(BackupItem b) {
 
-        BackupHandler h = new BackupHandler(getApplicationContext());
-	int ret = h.runBackup(b);
+		BackupHandler h = new BackupHandler(getApplicationContext());
+		int ret = h.runBackup(b);
 
-        if (ret != 0 && ret != BackupHandler.ERROR_DONOTRUN) {
-		Notification notif = new NotificationCompat.Builder(getApplicationContext())
-			.setContentTitle("Syncopoli")
-			.setContentText("Syncing " + b.name + " failed.")
-			.setTicker("Notification!")
-			.setWhen(System.currentTimeMillis())
-			.setSound(null)
-			.setVibrate(null)
-			.setAutoCancel(true)
-			.setSmallIcon(R.drawable.ic_action_refresh)
-			.build();
+		if (ret != 0 && ret != BackupHandler.ERROR_DONOTRUN) {
+			Notification notif = new NotificationCompat.Builder(getApplicationContext())
+				.setContentTitle("Syncopoli")
+				.setContentText("Syncing " + b.name + " failed.")
+				.setTicker("Notification!")
+				.setWhen(System.currentTimeMillis())
+				.setSound(null)
+				.setVibrate(null)
+				.setAutoCancel(true)
+				.setSmallIcon(R.drawable.ic_action_refresh)
+				.build();
 
-		NotificationManager notifyMan = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+			NotificationManager notifyMan = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
-		int m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
-		notifyMan.notify(m, notif);
-	}
+			// int m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
+			notifyMan.notify(b.name, 1, notif);
+		} else {
+			NotificationManager notifyMan = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+			notifyMan.cancel(b.name, 1);
+		}
     }
 }
