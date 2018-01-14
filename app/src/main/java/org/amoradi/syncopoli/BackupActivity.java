@@ -336,7 +336,13 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
     }
 
     public int runBackup(BackupItem b) {
-        syncBackups();
+        Snackbar.make(findViewById(R.id.backuplist_coordinator),
+                "Running '" + b.name + "'",
+                Snackbar.LENGTH_SHORT).show();
+
+        Intent i = new Intent(this, BackupBackgroundService.class);
+        i.putExtra("item", b);
+        startService(i);
         return 0;
     }
 

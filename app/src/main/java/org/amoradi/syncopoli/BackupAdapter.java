@@ -8,8 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder> implements IBackupItemClickHandler {
     IBackupHandler mBackupHandler;
@@ -20,6 +22,7 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
 
         public TextView mProfileTextView;
         public TextView mSrcTextView;
+        public ImageView mRunButtonView;
         public View mView;
 
         public ViewHolder(View v, IBackupItemClickHandler handler) {
@@ -33,12 +36,17 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
             mBackupClickHandler = handler;
             mProfileTextView = (TextView) v.findViewById(R.id.backup_item_profile_text);
             mSrcTextView = (TextView) v.findViewById(R.id.backup_item_source);
+
+            mRunButtonView = (ImageView) v.findViewById(R.id.backup_item_run_button);
+            mRunButtonView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             if (v instanceof LinearLayout) {
                 mBackupClickHandler.onBackupShowLog(getAdapterPosition());
+            } else if (v.getId() == mRunButtonView.getId()) {
+                mBackupClickHandler.onBackupRun(getAdapterPosition());
             }
         }
 
@@ -124,5 +132,9 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
     public void onBackupCopy(int pos) {
         mBackupHandler.copyBackup(mBackupHandler.getBackups().get(pos));
         notifyDataSetChanged();
+    }
+
+    public void onBackupRun(int pos) {
+        mBackupHandler.runBackup(mBackupHandler.getBackups().get(pos));
     }
 }
