@@ -43,6 +43,7 @@
     <string name="pref_title_ssh_password">SSH Password</string>
     <string name="pref_title_wifi_only">Wifi only</string>
     <string name="pref_title_wifi_name">SSIDs to sync (separated by ;)</string>
+    <string name="pref_title_verify_host">Verify connection</string>
     
     <string-array name="pref_entries_protocol">
         <item>SSH</item>

@@ -13,6 +13,13 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.jcraft.jsch.HostKey;
+import com.jcraft.jsch.HostKeyRepository;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.UserInfo;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,6 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 
 public class BackupHandler implements IBackupHandler {
     private List<BackupItem> mBackupItems;
@@ -315,6 +323,16 @@ public class BackupHandler implements IBackupHandler {
                     logFile.write(("ERROR: attempting to use password, but no password specified for SSH").getBytes());
                     return -1;
                 }
+
+                SSHManager sshman = new SSHManager(mContext);
+                String localfinger = sshman.getLocalHostFingerPrint();
+                String remotefinger = sshman.getRemoteHostFingerPrint();
+                if (!localfinger.equals(remotefinger)) {
+                    logFile.write("ERROR: could not confirm host key fingerprint:".getBytes());
+                    logFile.write(("       local:  " + localfinger).getBytes());
+                    logFile.write(("       remote: " + remotefinger).getBytes());
+                    return -1;
+                }
             }
 
             /*
@@ -336,10 +354,10 @@ public class BackupHandler implements IBackupHandler {
             if (protocol.equals("SSH")) {
                 if (use_ssh_password) {
                     args.add("-e");
-                    args.add(sshPath + " -y -p " + port);
+                    args.add(sshPath + " -p " + port);
                 } else {
                     args.add("-e");
-                    args.add(sshPath + " -y -p " + port + " -i " + private_key);
+                    args.add(sshPath + " -p " + port + " -i " + private_key);
                 }
 
                 if (b.direction == BackupItem.Direction.OUTGOING) {

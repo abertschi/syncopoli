@@ -95,4 +95,5 @@ dependencies {
     implementation ('com.github.ganfra:material-spinner:1.1.1') {
         exclude group: 'com.android.support', module: 'appcompat-v7'
     }
+    compile 'com.jcraft:jsch:0.1.54'
 }

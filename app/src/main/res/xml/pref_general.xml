@@ -3,6 +3,14 @@
         android:title="@string/pref_category_general"
         android:key="pref_key_general">
 
+        <ListPreference
+            android:title="@string/pref_title_protocol"
+            android:key="pref_key_protocol"
+            android:dialogTitle="@string/pref_title_protocol"
+            android:entries="@array/pref_entries_protocol"
+            android:entryValues="@array/pref_entries_protocol"
+            android:defaultValue="@string/pref_default_protocol"/>
+
         <EditTextPreference
             android:capitalize="none"
             android:defaultValue="10.0.0.3"
@@ -12,20 +20,6 @@
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="@string/pref_title_server_address" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="@string/pref_category_sync_backup"
-        android:key="pref_key_sync_backup">
-
-        <ListPreference
-            android:title="@string/pref_title_protocol"
-            android:key="pref_key_protocol"
-            android:dialogTitle="@string/pref_title_protocol"
-            android:entries="@array/pref_entries_protocol"
-            android:entryValues="@array/pref_entries_protocol"
-            android:defaultValue="@string/pref_default_protocol"/>
 
         <EditTextPreference
             android:defaultValue="22"
@@ -43,6 +37,16 @@
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="@string/pref_title_username" />
+
+        <Preference
+            android:title="@string/pref_title_verify_host"
+            android:key="pref_key_verify_host" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_category_sync_backup"
+        android:key="pref_key_sync_backup">
 
         <EditTextPreference
             android:capitalize="none"
