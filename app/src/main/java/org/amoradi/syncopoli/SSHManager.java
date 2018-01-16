@@ -19,8 +19,6 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -35,7 +33,11 @@ public class SSHManager {
         mJsch = new JSch();
         mRemoteHostKey = null;
 
-        mJsch.setKnownHosts(Paths.get(mContext.getFilesDir().getAbsolutePath() + ".ssh", "known_hosts").toString());
+        try {
+            mJsch.setKnownHosts(mContext.getFilesDir().getAbsolutePath() + "/.ssh/known_hosts");
+        } catch (JSchException e) {
+            Log.e("Syncopoli.SSHManager", "Could not load " + mContext.getFilesDir().getAbsolutePath() + "/.ssh/known_hosts: " + e.toString());
+        }
     }
 
     public HostKey getRemoteHostKey(String username, String password, String host, int port) {
@@ -43,7 +45,7 @@ public class SSHManager {
         String fp = "";
 
         try {
-            session = jsch.getSession(username, host, port);
+            session = mJsch.getSession(username, host, port);
         } catch (JSchException e) {
             Log.e("syncopoli.HostFingerPri", e.toString());
             return null;
@@ -70,6 +72,15 @@ public class SSHManager {
 
     public void acceptHostKey(HostKey hk) {
         mJsch.getHostKeyRepository().add(hk, null);
+    }
+
+    public boolean matchKey(String host, HostKey hk) {
+        HostKey[] hks = mJsch.getHostKeyRepository().getHostKey(host, null);
+        if (hks.length <= 0) {
+            return false;
+        }
+
+        return hks[0].getKey().equals(hk.getKey());
     }
 
 }

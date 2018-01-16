@@ -1,6 +1,8 @@
 package org.amoradi.syncopoli;
 
+import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.HostKey;
+import com.jcraft.jsch.HostKeyRepository;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +14,7 @@ import android.preference.PreferenceFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.widget.Toast;
 
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -145,7 +148,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         protected HostKey doInBackground(Void... params) {
 			SharedPreferences sp = getPreferenceScreen().getSharedPreferences();
 			String username = sp.getString(KEY_RSYNC_USERNAME, "");
-			String ssh_password = sp.getString(KEY_SSH_PASSWORD, "");
+			String password = sp.getString(KEY_SSH_PASSWORD, "");
 			String host = sp.getString(KEY_SERVER_ADDRESS, "");
 			int port = 0;
 
@@ -159,7 +162,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 				return null;
 			}
 
-			Hostkey hk = sshman.getRemoteHostKey(username, password, host, port);
+			HostKey hk = sshman.getRemoteHostKey(username, password, host, port);
             return hk;
         }
 
@@ -172,9 +175,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
 			SharedPreferences sp = getPreferenceScreen().getSharedPreferences();
 			String host = sp.getString(KEY_SERVER_ADDRESS, "");
-			String localKey = sshman.getHostKeyRepository().getHostKey(host, HostKeyRepository.GUESS);
 
-			if (localKey.equals(result.getKey())) {
+			if (sshman.matchKey(host, result)) {
 				Toast.makeText(mContext, "Host keys match", Toast.LENGTH_SHORT).show();
 				return;
 			}
@@ -194,7 +196,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             };
 
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AppTheme);
-            builder.setMessage("Does the following fingerprint match the host?\n" + result.getFingerPrint());
+            builder.setMessage("Does the following fingerprint match the host?\n" + result.getFingerPrint(new JSch()));
             builder.setPositiveButton("Yes", dialogClickListener);
             builder.setNegativeButton("No", dialogClickListener);
             builder.show();

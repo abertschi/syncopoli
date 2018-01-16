@@ -323,16 +323,6 @@ public class BackupHandler implements IBackupHandler {
                     logFile.write(("ERROR: attempting to use password, but no password specified for SSH").getBytes());
                     return -1;
                 }
-
-                SSHManager sshman = new SSHManager(mContext);
-                String localfinger = sshman.getLocalHostFingerPrint();
-                String remotefinger = sshman.getRemoteHostFingerPrint();
-                if (!localfinger.equals(remotefinger)) {
-                    logFile.write("ERROR: could not confirm host key fingerprint:".getBytes());
-                    logFile.write(("       local:  " + localfinger).getBytes());
-                    logFile.write(("       remote: " + remotefinger).getBytes());
-                    return -1;
-                }
             }
 
             /*
