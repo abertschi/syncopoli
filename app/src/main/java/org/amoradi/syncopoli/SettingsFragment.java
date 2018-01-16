@@ -1,5 +1,6 @@
 package org.amoradi.syncopoli;
 
+import com.jcraft.jsch.HostKey;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,7 +26,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public final static String KEY_SSH_PASSWORD = "pref_key_ssh_password";
     public final static String KEY_WIFI_ONLY = "pref_key_wifi_only";
     public final static String KEY_WIFI_NAME = "pref_key_wifi_name";
-    public final static String KEY_HOST_KEY_FINGERPRINT = "pref_key_host_key_fingerprint";
     public final static String KEY_VERIFY_HOST = "pref_key_verify_host";
 
 	private final static int DEFAULT_RSYNC_PORT = 873;
@@ -47,8 +47,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(KEY_WIFI_ONLY)
-            || key.equals(KEY_HOST_KEY_FINGERPRINT)) {
+        if (key.equals(KEY_WIFI_ONLY)) {
             return;
         }
 
@@ -133,28 +132,59 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
     }
 
-    private class VerifyHostFingerprintTask extends AsyncTask<Void, Void, String> {
+    private class VerifyHostFingerprintTask extends AsyncTask<Void, Void, HostKey> {
         private Context mContext;
+		private SSHManager sshman;
 
         VerifyHostFingerprintTask(Context ctx) {
             mContext = ctx;
-        }
-        @Override
-        protected String doInBackground(Void... params) {
-            SSHManager sshman = new SSHManager(mContext);
-            return sshman.getRemoteHostFingerPrint();
+			sshman = new SSHManager(mContext);
         }
 
         @Override
-        protected void onPostExecute(final String result) {
+        protected HostKey doInBackground(Void... params) {
+			SharedPreferences sp = getPreferenceScreen().getSharedPreferences();
+			String username = sp.getString(KEY_RSYNC_USERNAME, "");
+			String ssh_password = sp.getString(KEY_SSH_PASSWORD, "");
+			String host = sp.getString(KEY_SERVER_ADDRESS, "");
+			int port = 0;
+
+			try {
+				port = Integer.parseInt(sp.getString(KEY_PORT, "22"));
+			} catch (java.lang.NumberFormatException e) {
+				// the error will be handled later
+			}
+
+			if (username.equals("") || host.equals("") || port == 0) {
+				return null;
+			}
+
+			Hostkey hk = sshman.getRemoteHostKey(username, password, host, port);
+            return hk;
+        }
+
+        @Override
+        protected void onPostExecute(final HostKey result) {
+			if (result == null) {
+				Toast.makeText(mContext, "Failed to verify host.", Toast.LENGTH_SHORT).show();
+				return;
+			}
+
+			SharedPreferences sp = getPreferenceScreen().getSharedPreferences();
+			String host = sp.getString(KEY_SERVER_ADDRESS, "");
+			String localKey = sshman.getHostKeyRepository().getHostKey(host, HostKeyRepository.GUESS);
+
+			if (localKey.equals(result.getKey())) {
+				Toast.makeText(mContext, "Host keys match", Toast.LENGTH_SHORT).show();
+				return;
+			}
+
             DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    SSHManager sshman = new SSHManager(mContext);
-
                     switch (which){
                         case DialogInterface.BUTTON_POSITIVE:
-                            sshman.saveRemoteHostFingerPrint(result);
+							sshman.acceptHostKey(result);
                             break;
 
                         case DialogInterface.BUTTON_NEGATIVE:
@@ -164,7 +194,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             };
 
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AppTheme);
-            builder.setMessage("Does the following fingerprint match the host?\n" + result);
+            builder.setMessage("Does the following fingerprint match the host?\n" + result.getFingerPrint());
             builder.setPositiveButton("Yes", dialogClickListener);
             builder.setNegativeButton("No", dialogClickListener);
             builder.show();
