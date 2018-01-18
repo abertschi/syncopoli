@@ -1,9 +1,5 @@
 package org.amoradi.syncopoli;
 
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.HostKey;
-import com.jcraft.jsch.HostKeyRepository;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -12,9 +8,23 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -110,7 +120,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         verifyButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new VerifyHostFingerprintTask(getActivity().getWindow().getContext()).execute();
+                new GetHostFingerprintTask(getActivity().getWindow().getContext()).execute();
                 return true;
             }
         });
@@ -135,58 +145,60 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
     }
 
-    private class VerifyHostFingerprintTask extends AsyncTask<Void, Void, HostKey> {
-        private Context mContext;
+	private class AcceptHostFingerprintTask extends AsyncTask<Void, Void, Boolean> {
+		private Context mContext;
 		private SSHManager sshman;
+		private String fingerprint;
 
-        VerifyHostFingerprintTask(Context ctx) {
+		AcceptHostFingerprintTask(Context ctx, String fp) {
+		    mContext = ctx;
+		    sshman = new SSHManager(mContext);
+            fingerprint = fp;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+		    return sshman.acceptHostKeyFingerprint(fingerprint);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+		    if (result) {
+		        Log.i("Syncopoli", "Remote host fingerprint accepted");
+            } else {
+                Log.e("Syncopoli", "Could not accept remote host fingerprint");
+                Toast.makeText(mContext, "Could not accept remote host fingerprint, please see logcat for details", Toast.LENGTH_LONG).show();
+            }
+        }
+	}
+
+    private class GetHostFingerprintTask extends AsyncTask<Void, String, String> {
+        private Context mContext;
+        private SSHManager sshman;
+
+        GetHostFingerprintTask(Context ctx) {
             mContext = ctx;
-			sshman = new SSHManager(mContext);
+            sshman = new SSHManager(mContext);
         }
 
         @Override
-        protected HostKey doInBackground(Void... params) {
-			SharedPreferences sp = getPreferenceScreen().getSharedPreferences();
-			String username = sp.getString(KEY_RSYNC_USERNAME, "");
-			String password = sp.getString(KEY_SSH_PASSWORD, "");
-			String host = sp.getString(KEY_SERVER_ADDRESS, "");
-			int port = 0;
-
-			try {
-				port = Integer.parseInt(sp.getString(KEY_PORT, "22"));
-			} catch (java.lang.NumberFormatException e) {
-				// the error will be handled later
-			}
-
-			if (username.equals("") || host.equals("") || port == 0) {
-				return null;
-			}
-
-			HostKey hk = sshman.getRemoteHostKey(username, password, host, port);
-            return hk;
+        protected String doInBackground(Void... params) {
+            return sshman.getRemoteHostFingerprint();
         }
 
         @Override
-        protected void onPostExecute(final HostKey result) {
-			if (result == null) {
-				Toast.makeText(mContext, "Failed to verify host.", Toast.LENGTH_SHORT).show();
-				return;
-			}
-
-			SharedPreferences sp = getPreferenceScreen().getSharedPreferences();
-			String host = sp.getString(KEY_SERVER_ADDRESS, "");
-
-			if (sshman.matchKey(host, result)) {
-				Toast.makeText(mContext, "Host keys match", Toast.LENGTH_SHORT).show();
-				return;
-			}
+        protected void onPostExecute(final String result) {
+            if (result == null) {
+                Toast.makeText(mContext, "Failed to verify host.", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     switch (which){
                         case DialogInterface.BUTTON_POSITIVE:
-							sshman.acceptHostKey(result);
+                            new AcceptHostFingerprintTask(mContext, result).execute();
                             break;
 
                         case DialogInterface.BUTTON_NEGATIVE:
@@ -196,7 +208,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             };
 
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AppTheme);
-            builder.setMessage("Does the following fingerprint match the host?\n" + result.getFingerPrint(new JSch()));
+            builder.setMessage("Does the following fingerprint match the host?\n" + result);
             builder.setPositiveButton("Yes", dialogClickListener);
             builder.setNegativeButton("No", dialogClickListener);
             builder.show();

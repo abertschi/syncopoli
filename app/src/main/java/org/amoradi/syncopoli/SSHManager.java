@@ -3,84 +3,181 @@ package org.amoradi.syncopoli;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Base64;
 import android.util.Log;
 
-import com.jcraft.jsch.HostKey;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.UserInfo;
-
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SSHManager {
     private Context mContext;
-    private JSch mJsch;
-    private HostKey mRemoteHostKey;
 
-    SSHManager(Context ctx) {
+    /* This needs the patched version of dropbear!
+     * see gitlab.com/fengshaun/android-dropbear commit f49af1902d3d683c59a7445746fa3a35cd07ef33
+     * Format: Fingerprint: md5 ab:cd:ef:...
+     */
+    private Pattern mFingerprintPattern = Pattern.compile("^Fingerprint: [\\w\\d]+ ([\\w:]+)$");
+    private Pattern mAcceptedPattern = Pattern.compile("^Accepted fingerprint$");
+
+    private String host;
+    private String port;
+
+    SSHManager(Context ctx) throws NumberFormatException {
         mContext = ctx;
-        mJsch = new JSch();
-        mRemoteHostKey = null;
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
+        host = sp.getString(SettingsFragment.KEY_SERVER_ADDRESS, "");
+        port = sp.getString(SettingsFragment.KEY_PORT, "22");
 
         try {
-            mJsch.setKnownHosts(mContext.getFilesDir().getAbsolutePath() + "/.ssh/known_hosts");
-        } catch (JSchException e) {
-            Log.e("Syncopoli.SSHManager", "Could not load " + mContext.getFilesDir().getAbsolutePath() + "/.ssh/known_hosts: " + e.toString());
+            Integer.parseInt(port);
+        } catch (java.lang.NumberFormatException e) {
+            Log.e("Syncopoli", "Could not convert port to integer: " + e.toString());
+            throw e;
         }
     }
 
-    public HostKey getRemoteHostKey(String username, String password, String host, int port) {
-        Session session = null;
-        String fp = "";
+    public String getRemoteHostFingerprint() {
+        List<String> args = new ArrayList<>();
 
+        File f = new File(mContext.getFilesDir(), "ssh");
+        args.add(f.getAbsolutePath());
+
+        args.add("-p");
+        args.add(port);
+        /* this option is added in patched version of dropbear
+         * -C make dropbear print remote host fingerprint and exit, which is what we want
+         */
+        args.add("-C");
+        args.add(host);
+
+        ProcessBuilder pb = new ProcessBuilder(args);
+        pb.directory(mContext.getFilesDir());
+        pb.redirectErrorStream(true);
+
+        // Set environment (make sure we have reasonable $HOME, so ssh can store keys)
+        Map<String, String> env = pb.environment();
+        env.put("HOME", mContext.getFilesDir().getAbsolutePath());
+
+        /*
+         * RUN PROCESS
+         */
+
+        Process process;
         try {
-            session = mJsch.getSession(username, host, port);
-        } catch (JSchException e) {
-            Log.e("syncopoli.HostFingerPri", e.toString());
+            process = pb.start();
+        } catch (IOException e) {
+            Log.e("Syncopoli", "Could not run ssh: " + e.toString());
             return null;
         }
 
-        Properties props = new Properties();
-        props.put("StrictHostKeyChecking", "yes");
-        session.setConfig(props);
+        /*
+         * GET STDOUT/STDERR
+         */
 
-        if (!password.equals("")) {
-            session.setPassword(password);
-        }
+        String temp;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
+        /* Read STDOUT & STDERR */
         try {
-            session.connect();
-        } catch (JSchException e) {
-            mRemoteHostKey = session.getHostKey();
-            Log.e("syncopoli.HostFingerPri", "FINGERPRINT: " + mRemoteHostKey.getFingerPrint(mJsch));
+            while ((temp = reader.readLine()) != null) {
+                Log.e("BackupHandler", temp + "\n");
+
+                Matcher m = mFingerprintPattern.matcher(temp);
+                if (m.matches()) {
+                    Log.e("Syncopoli", "MATCHES FINGERPRINT: " + m.group(1));
+                    String fp = m.group(1);
+
+                    try {
+                        process.waitFor();
+                    } catch (InterruptedException e) {
+                        Log.e("Syncopoli", e.toString());
+                    }
+
+                    return fp;
+                }
+            }
+        } catch (IOException e) {
+            Log.e("Syncopoli", "Could not read/write from ssh process");
+            return null;
         }
 
-        session.disconnect();
-        return mRemoteHostKey;
+        Log.e("Syncopoli", "Unknown error occurred when trying to communicate with ssh process");
+        return null;
     }
 
-    public void acceptHostKey(HostKey hk) {
-        mJsch.getHostKeyRepository().add(hk, null);
-    }
+    public boolean acceptHostKeyFingerprint(String fingerprint) {
+        List<String> args = new ArrayList<>();
 
-    public boolean matchKey(String host, HostKey hk) {
-        HostKey[] hks = mJsch.getHostKeyRepository().getHostKey(host, null);
-        if (hks.length <= 0) {
+        File f = new File(mContext.getFilesDir(), "ssh");
+        args.add(f.getAbsolutePath());
+
+        args.add("-p");
+        args.add(port);
+        /* this option is added in patched version of dropbear
+         * -C make dropbear print remote host fingerprint and exit, which is what we want
+         */
+        args.add("-A");
+        args.add(fingerprint);
+        args.add(host);
+
+        ProcessBuilder pb = new ProcessBuilder(args);
+        pb.directory(mContext.getFilesDir());
+        pb.redirectErrorStream(true);
+
+        // Set environment (make sure we have reasonable $HOME, so ssh can store keys)
+        Map<String, String> env = pb.environment();
+        env.put("HOME", mContext.getFilesDir().getAbsolutePath());
+
+        /*
+         * RUN PROCESS
+         */
+
+        Process process;
+        try {
+            process = pb.start();
+        } catch (IOException e) {
+            Log.e("Syncopoli", "Could not run ssh: " + e.toString());
             return false;
         }
 
-        return hks[0].getKey().equals(hk.getKey());
-    }
+        /*
+         * GET STDOUT/STDERR
+         */
 
+        String temp;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+        /* Read STDOUT & STDERR */
+        try {
+            while ((temp = reader.readLine()) != null) {
+                Log.e("BackupHandler", temp + "\n");
+
+                Matcher m = mAcceptedPattern.matcher(temp);
+                if (m.matches()) {
+                    Log.e("Syncopoli", "Fingerprint accepted");
+
+                    try {
+                        process.waitFor();
+                    } catch (InterruptedException e) {
+                        Log.e("Syncopoli", e.toString());
+                    }
+
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            Log.e("Syncopoli", "Could not read/write from ssh process");
+            return false;
+        }
+
+        Log.e("Syncopoli", "Unknown error occurred when trying to communicate with ssh process");
+        return false;
+    }
 }
