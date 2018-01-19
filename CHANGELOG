@@ -1,3 +1,15 @@
+v0.4.5
+------
+- enable running an individual profile from ui
+- fix copy operation
+- fix notifications appearing when they shouldn't
+- support special characters in profile name
+
+v0.4.4
+------
+- fix SSID restriction
+- various other bugfixes
+
 v0.4.3
 ------
 - add x86 support
