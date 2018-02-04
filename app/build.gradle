@@ -8,8 +8,8 @@ android {
         applicationId "org.amoradi.syncopoli"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 13
-        versionName "v0.4.5"
+        versionCode 14
+        versionName "v0.4.5.1"
         vectorDrawables.useSupportLibrary = true
 
         externalNativeBuild {
