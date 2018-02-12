@@ -53,5 +53,5 @@
     <string name="pref_category_sync_backup">Sync &amp; Backup</string>
 
     <string name="pref_sum_wifi_only">La synchronisation nécessitera une connexion Wifi pour démarrer</string>
-    <string name="pref_sum_no_wifi_only">La synchronisation se fera sur n'importe quelle connexion (y compris les données mobiles)</string>
+    <string name="pref_sum_no_wifi_only">La synchronisation se fera sur n\'importe quelle connexion (y compris les données mobiles)</string>
 </resources>
