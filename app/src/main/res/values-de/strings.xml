@@ -7,7 +7,7 @@
     <string name="action_run_backup">Starte Backup</string>
 
     <string name="addbackupitem_name">Profilname</string>
-    <string name="addbackupitem_origin">Quelle</string>
+    <string name="addbackupitem_origin">Quellen</string>
     <string name="addbackupitem_destination">Ziel</string>
     <string name="addbackupitem_direction_prompt">Backup Richtung</string>
     <string-array name="addbackupitem_direction_entries">

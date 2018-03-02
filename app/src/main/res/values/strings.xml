@@ -12,7 +12,7 @@
     <string name="action_run_backup">Run backup</string>
 
     <string name="addbackupitem_name">Profile name</string>
-    <string name="addbackupitem_origin">Origin</string>
+    <string name="addbackupitem_origin">Origins</string>
     <string name="addbackupitem_destination">Destination</string>
     <string name="addbackupitem_rsync_options">Additional rsync options</string>
     <string name="addbackupitem_frequency">Frequency (in hours)</string>

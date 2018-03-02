@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -90,7 +91,7 @@ public class AddBackupItemFragment extends Fragment {
         }
 
         v_name.setText(mBackup.name);
-        v_src.setText(mBackup.source);
+        v_src.setText(TextUtils.join("\n", mBackup.sources));
         v_dst.setText(mBackup.destination);
         v_opts.setText(mBackup.rsync_options);
 
@@ -123,7 +124,7 @@ public class AddBackupItemFragment extends Fragment {
             View v = getView();
 
             EditText t = (EditText) v.findViewById(R.id.addbackupitem_source);
-            i.source = t.getText().toString();
+            i.sources = t.getText().toString().replaceAll("(?m)^[ \t]*\n", "").split("\n");
 
             t = (EditText) v.findViewById(R.id.addbackupitem_destination);
             i.destination = t.getText().toString();

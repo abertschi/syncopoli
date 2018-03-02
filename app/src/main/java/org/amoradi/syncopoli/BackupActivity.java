@@ -17,6 +17,7 @@ import android.support.annotation.LayoutRes;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -252,7 +253,13 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 			for (BackupItem i : backups) {
 				JSONObject p = new JSONObject();
 				p.put("name", i.name);
-				p.put("source", i.source);
+
+				JSONArray s = new JSONArray();
+				for (String source : i.sources) {
+				    s.put(source);
+				}
+				p.put("sources", s);
+
 				p.put("destination", i.destination);
 				p.put("rsync_options", i.rsync_options);
 
@@ -371,7 +378,13 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 
                 BackupItem b = new BackupItem();
                 b.name = jb.getString("name");
-                b.source = jb.getString("source");
+
+                JSONArray sources = jb.getJSONArray("sources");
+                b.sources = new String[sources.length()];
+                for (int k= 0; k < sources.length(); k++) {
+                    b.sources[k] = sources.getString(k);
+                }
+
                 b.destination = jb.getString("destination");
                 b.rsync_options = jb.getString("rsync_options");
 
