@@ -57,11 +57,13 @@ Building
 See `app/build.gradle` for dependencies (requires android `sdk` and `ndk`, make sure to properly set up both).
 
 ```
-$ git clone --recursive
-$ gradle build
+$ git clone --recursive # clones sources for rsync and ssh
+$ gradle assembleRelease
 ```
 
 You have to have `gradle` installed. See [gradle.org](https://gradle.org) or your local fresh repo.
+
+Starting with v0.4.5.4, you need `gradle 4.4.1`, `build-tools 27.0.3`, and `ndk-tools r15c`.
 
 FAQ
 ---
