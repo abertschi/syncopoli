@@ -275,7 +275,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 	}
 
     public int addBackup(BackupItem item) {
-        if (mBackupHandler.addBackup(item) == BackupHandler.ERROR_EXISTS) {
+        if (mBackupHandler.addBackup(item) == BackupHandler.ERROR_BACKUP_EXISTS) {
             Toast.makeText(getApplicationContext(), "Profile '" + item.name + "' already exists", Toast.LENGTH_SHORT).show();
         }
 
@@ -382,7 +382,11 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
             return 0;
         }
 
-        String[] abis = {Build.CPU_ABI, Build.CPU_ABI2}; // use Build.SUPPORTED_ABIS from API level 21
+		String[] abis = {Build.CPU_ABI, Build.CPU_ABI2};
+		if (Build.VERSION.SDK_INT >= 21) {
+			abis = Build.SUPPORTED_ABIS;
+		}
+
 		InputStream src = null;
 		
 		// try to grab matching executable for a ABI supported by this device

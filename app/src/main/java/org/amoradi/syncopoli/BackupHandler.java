@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -21,6 +22,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -32,9 +34,11 @@ public class BackupHandler implements IBackupHandler {
     Context mContext;
 
     public static final int ERROR_DONOTRUN = -2;
-    public static final int ERROR_EXISTS = -3;
-    public static final int ERROR_MISSING = -4;
+    public static final int ERROR_BACKUP_EXISTS = -3;
+    public static final int ERROR_BACKUP_MISSING = -4;
     public static final int ERROR_TOO_MANY_RESULTS = -5;
+	public static final int ERROR_RSYNC_MISSING = -6;
+	public static final int ERROR_SSH_MISSING = -7;
 
     public BackupHandler(Context ctx) {
         mContext = ctx;
@@ -48,7 +52,7 @@ public class BackupHandler implements IBackupHandler {
 
         for (BackupItem x : mBackupItems) {
             if (x.name.equals(item.name)) {
-                return ERROR_EXISTS;
+                return ERROR_BACKUP_EXISTS;
             }
         }
 
@@ -106,7 +110,7 @@ public class BackupHandler implements IBackupHandler {
         );
 
         if (c.getCount() <= 0) {
-            return BackupHandler.ERROR_MISSING;
+            return BackupHandler.ERROR_BACKUP_MISSING;
         }
 
         if (c.getCount() > 1) {
@@ -246,11 +250,25 @@ public class BackupHandler implements IBackupHandler {
             String rsyncPath = new File(mContext.getFilesDir(), "rsync").getAbsolutePath();
             String sshPath = new File(mContext.getFilesDir(), "ssh").getAbsolutePath();
 
-            File f = new File(rsyncPath);
             FileOutputStream logFile = mContext.openFileOutput(b.logFileName, Context.MODE_PRIVATE);
 
             updateBackupTimestamp(b);
             logFile.write((b.lastUpdate.toString() + " \n\n").getBytes());
+
+            File f = new File(rsyncPath);
+
+            if (!f.exists()) {
+                logFile.write(("ERROR: Missing rsync binary. Please submit a bug report and include logcat output along with the following info:\n\n").getBytes());
+
+                String[] abis = {Build.CPU_ABI, Build.CPU_ABI2};
+                if (Build.VERSION.SDK_INT >= 21) {
+                    abis = Build.SUPPORTED_ABIS;
+                }
+
+                logFile.write(("SUPPORTED ABIS: " + Arrays.toString(abis) + "\n").getBytes());
+
+                return ERROR_RSYNC_MISSING;
+            }
 
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
             String rsync_username = prefs.getString(SettingsFragment.KEY_RSYNC_USERNAME, "");
