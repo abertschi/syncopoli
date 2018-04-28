@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.json.*;
@@ -363,65 +364,75 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         tr.commit();
     }
 
-    public void copyExecutables() {
-        copyExecutable("rsync");
-        copyExecutable("ssh");
+    public int copyExecutables() {
+		int ret = copyExecutable("rsync");
+
+		if (ret != 0) {
+			return ret;
+		}
+		
+        return copyExecutable("ssh");
     }
 
-    public void copyExecutable(String filename) {
+    public int copyExecutable(String filename) {
         File file = getFileStreamPath(filename);
 
         // @todo: what about updated native executables?
         if (file.exists()) {
-            return;
+            return 0;
         }
 
         String[] abis = {Build.CPU_ABI, Build.CPU_ABI2}; // use Build.SUPPORTED_ABIS from API level 21
-        for (String abi : abis) {
-            // try to grab matching executable for a ABI supported by this device
-            InputStream src;
+		InputStream src = null;
+		
+		// try to grab matching executable for a ABI supported by this device
+		for (String abi : abis) {
             try {
                 src = getAssets().open(abi + '/' + filename);
             } catch (IOException e) {
                 // no need to close src here
+				Log.d(TAG, abi + " is not supported");
                 continue;
             }
+		}
 
-            OutputStream dst = null;
-            try {
-                dst = new DataOutputStream(openFileOutput(filename, Context.MODE_PRIVATE));
+		if (src == null) {
+			Log.e(TAG, "Could not find supported rsync binary for ABI: " + Arrays.toString(abis));
+			return -1;
+		}
 
-                byte data[] = new byte[4096];
-                int count;
+		Log.d(TAG, "Found appropriate rsync binary: " + src);
 
-                while ((count = src.read(data)) != -1) {
-                    dst.write(data, 0, count);
-                }
-            } catch (IOException e) {
-                Log.e(TAG, "Error copying executable: " + e.toString());
-                return;
-            } finally {
-                try {
-                    src.close();
-                    if (dst != null) {
-                        dst.close();
-                    }
-                } catch  (IOException e) {
-                    Log.e(TAG, "Error closing input stream: " + e.toString());
-                }
-            }
+		OutputStream dst = null;
+		try {
+			dst = new DataOutputStream(openFileOutput(filename, Context.MODE_PRIVATE));
 
-            File f = new File(getFilesDir(), filename);
-            try {
-                f.setExecutable(true);
-                return;
-            } catch (SecurityException e) {
-                Log.e(TAG, "Error setting executable flag: " + e.toString());
-            }
+			byte data[] = new byte[4096];
+			int count;
 
-            // everything went well
-            return;
-        }
-        Log.e(TAG, "ERROR selecting native executables for device's ABI");
-    }
+			while ((count = src.read(data)) != -1) {
+				dst.write(data, 0, count);
+			}
+		} catch (IOException e) {
+			Log.e(TAG, "Error copying executable: " + e.toString());
+			return -1;
+		}
+
+		try {
+			src.close();
+			dst.close();
+		} catch  (IOException e) {
+			Log.e(TAG, "Error closing input or output stream: " + e.toString());
+		}
+
+		File f = new File(getFilesDir(), filename);
+		try {
+			f.setExecutable(true);
+		} catch (SecurityException e) {
+			Log.e(TAG, "Error setting executable flag: " + e.toString());
+			return -1;
+		}
+
+		return 0;
+	}
 }
