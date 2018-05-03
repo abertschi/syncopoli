@@ -13,7 +13,7 @@ android {
 
         externalNativeBuild {
             ndkBuild {
-                targets 'ssh'
+                targets 'ssh', 'rsync'
                 // arguments 'NDK_LOG=1'
             }
         }
