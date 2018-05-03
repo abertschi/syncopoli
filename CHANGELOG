@@ -1,9 +1,10 @@
-v0.4.5
+v0.4.5.x
 ------
 - enable running an individual profile from ui
 - fix copy operation
 - fix notifications appearing when they shouldn't
 - support special characters in profile name
+- fix frequency of 0 not disabling automatic sync
 
 v0.4.4
 ------
