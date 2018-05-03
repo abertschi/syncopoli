@@ -85,7 +85,12 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         long freq = Long.parseLong(prefs.getString(SettingsFragment.KEY_FREQUENCY, "8"));
         freq = freq * 3600; // hours to seconds
 
-        ContentResolver.addPeriodicSync(mAccount, SYNC_AUTHORITY, new Bundle(), freq);
+        // ContentResolver.addPeriodicSync enforces a min of 1 hour
+        if (freq == 0) {
+            ContentResolver.removePeriodicSync(mAccount, SYNC_AUTHORITY, new Bundle());
+        } else {
+            ContentResolver.addPeriodicSync(mAccount, SYNC_AUTHORITY, new Bundle(), freq);
+        }
 
         copyExecutables();
 
