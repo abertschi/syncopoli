@@ -290,8 +290,8 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         return 0;
     }
 
-    public int updateBackup(BackupItem item) {
-        mBackupHandler.updateBackup(item);
+    public int updateBackup(String old_name, BackupItem item) {
+        mBackupHandler.updateBackup(old_name, item);
         mBackupHandler.updateBackupList();
 
         BackupListFragment f = new BackupListFragment();

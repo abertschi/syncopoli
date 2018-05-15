@@ -145,7 +145,7 @@ public class AddBackupItemFragment extends Fragment {
             if (mBackup == null) {
                 mHandler.addBackup(i);
             } else {
-                mHandler.updateBackup(i);
+                mHandler.updateBackup(mBackup.name, i);
             }
         } else {
             return super.onOptionsItemSelected(item);

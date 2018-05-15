@@ -216,7 +216,7 @@ public class BackupHandler implements IBackupHandler {
         dbHelper.close();
     }
 
-    public int updateBackup(BackupItem b) {
+    public int updateBackup(String old_name, BackupItem b) {
         BackupSyncOpenHelper dbHelper = new BackupSyncOpenHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -234,7 +234,7 @@ public class BackupHandler implements IBackupHandler {
             values.put(BackupSyncSchema.COLUMN_DIRECTION, "OUTGOING");
         }
 
-        db.update(BackupSyncSchema.TABLE_NAME, values, "name='" + b.name + "'", null);
+        db.update(BackupSyncSchema.TABLE_NAME, values, "name='" + old_name + "'", null);
         db.close();
         dbHelper.close();
 

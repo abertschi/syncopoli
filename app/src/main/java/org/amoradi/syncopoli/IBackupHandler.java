@@ -7,7 +7,7 @@ public interface IBackupHandler {
     int removeBackup(BackupItem bi);
     int editBackup(BackupItem bi);
     int copyBackup(BackupItem bi);
-    int updateBackup(BackupItem bi);
+    int updateBackup(String old_name, BackupItem bi);
     int runBackup(BackupItem bi);
     void showLog(BackupItem bi);
     void updateBackupTimestamp(BackupItem bi);
