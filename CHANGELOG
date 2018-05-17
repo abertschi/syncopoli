@@ -1,5 +1,11 @@
-v0.4.5.x
+v0.4.6
 ------
+- fix notification crash on API < 21
+- fix edit/copy/rename operation on profiles
+- fix rsync protocol not using port
+
+v0.4.5.x
+--------
 - enable running an individual profile from ui
 - fix copy operation
 - fix notifications appearing when they shouldn't
