@@ -49,11 +49,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 				newport = DEFAULT_RSYNC_PORT;
 			}
 
-			if (newport) {
+			if (newport > 0) {
 				getPreferenceScreen()
 					.getSharedPreferences()
 					.edit()
-					.putString(KEY_PORT, newport)
+					.putString(KEY_PORT, Integer.toString(newport))
 					.apply();
 			}
 		}
