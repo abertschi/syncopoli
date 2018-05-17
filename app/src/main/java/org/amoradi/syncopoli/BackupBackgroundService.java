@@ -1,12 +1,11 @@
 package org.amoradi.syncopoli;
 
-import java.util.Date;
-
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.NotificationCompat;
@@ -40,6 +39,13 @@ public class BackupBackgroundService extends IntentService {
 		BackupHandler h = new BackupHandler(getApplicationContext());
 		int ret = h.runBackup(b);
 
+		int notif_icon = R.drawable.ic_action_refresh;
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			// < lollipop, notification doesn't support vector icons
+			notif_icon = R.drawable.ic_action_refresh_bitmap;
+		}
+
 		if (ret != 0 && ret != BackupHandler.ERROR_DONOTRUN) {
 			Notification notif = new NotificationCompat.Builder(getApplicationContext())
 				.setContentTitle("Syncopoli")
@@ -49,7 +55,7 @@ public class BackupBackgroundService extends IntentService {
 				.setSound(null)
 				.setVibrate(null)
 				.setAutoCancel(true)
-				.setSmallIcon(R.drawable.ic_action_refresh)
+				.setSmallIcon(notif_icon)
 				.build();
 
 			NotificationManager notifyMan = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
