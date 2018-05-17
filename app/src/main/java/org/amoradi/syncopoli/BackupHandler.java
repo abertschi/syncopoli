@@ -351,6 +351,8 @@ public class BackupHandler implements IBackupHandler {
                 }
 
             } else if (protocol.equals("Rsync")) {
+				args.add("--port=" + port);
+				
                 if (b.direction == BackupItem.Direction.OUTGOING) {
                     args.add(b.source);
                     args.add(rsync_username + "@" + server_address + "::" + b.destination);

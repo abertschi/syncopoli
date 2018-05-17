@@ -21,13 +21,44 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public final static String KEY_WIFI_ONLY = "pref_key_wifi_only";
     public final static String KEY_WIFI_NAME = "pref_key_wifi_name";
 
+	private final static int DEFAULT_RSYNC_PORT = 873;
+	private final static int DEFAULT_SSH_PORT = 22;
+	
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(KEY_WIFI_ONLY) || key.equals(KEY_RSYNC_PASSWORD)) {
             return;
         }
 
-        Preference pref = findPreference(key);
+		/*
+		 * if user is changing the protocol and leaves the port as default, then we change
+		 * the port to match the default for the protocol selected. Else, if the user has
+		 * changed the port to a custom one, then leave it alone since User Knows Best (TM)
+		 */
+		
+		if (key.equals(KEY_PROTOCOL)) {
+			SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+			int port = Integer.parseInt(prefs.getString(KEY_PORT, "22"));
+
+			int newport = -1;
+
+			if (prefs.getString(KEY_PROTOCOL, "SSH").equals("SSH") && port == DEFAULT_RSYNC_PORT) {
+				newport = DEFAULT_SSH_PORT;
+			} else if (prefs.getString(KEY_PROTOCOL, "SSH").equals("Rsync") && port == DEFAULT_SSH_PORT) {
+				newport = DEFAULT_RSYNC_PORT;
+			}
+
+			if (newport) {
+				getPreferenceScreen()
+					.getSharedPreferences()
+					.edit()
+					.putString(KEY_PORT, newport)
+					.apply();
+			}
+		}
+
+		Preference pref = findPreference(key);
         String summary = sharedPreferences.getString(key, "Not set");
         pref.setSummary(summary);
     }
