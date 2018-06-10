@@ -68,6 +68,10 @@ Starting with v0.4.5.4, you need `gradle 4.4.1`, `build-tools 27.0.3`, and `ndk-
 FAQ
 ---
 
+Q: Syncopoli fails! I get: "ssh: Exited: String too long"!
+
+A: Syncopoli needs an ssh key in dropbear format. See "SSH Key" section above.
+
 Q: How do I use this...thing?
 
 A: Set your global options by going to `settings` (see `Global Options` above), then press the plus button to create individual profiles. The play button on top bar runs all sync tasks. Hold your finger over each profile to edit/delete them.
