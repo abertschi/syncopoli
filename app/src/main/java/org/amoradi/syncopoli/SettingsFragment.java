@@ -23,7 +23,20 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
 	private final static int DEFAULT_RSYNC_PORT = 873;
 	private final static int DEFAULT_SSH_PORT = 22;
-	
+
+    public final static String[] KEYS = {
+        KEY_SERVER_ADDRESS,
+        KEY_PROTOCOL,
+        KEY_RSYNC_USERNAME,
+        KEY_RSYNC_PASSWORD,
+        KEY_RSYNC_OPTIONS,
+        KEY_PRIVATE_KEY,
+        KEY_PORT,
+        KEY_FREQUENCY,
+        KEY_SSH_PASSWORD,
+        KEY_WIFI_ONLY,
+        KEY_WIFI_NAME
+    };
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {

@@ -44,6 +44,27 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
     public static final String SYNC_ACCOUNT_NAME = "Syncopoli Sync Account";
     public static final String SYNC_ACCOUNT_TYPE = "org.amoradi.syncopoli";
 
+	class PrefExporter {
+		private JSONObject e;
+		private SharedPreferences p;
+		private SharedPreferences.Editor editor;
+
+		PrefExporter(SharedPreferences p, JSONObject e) {
+			this.p = p;
+			this.e = e;
+
+			editor = p.edit();
+		}
+
+		public void exp(String key) throws JSONException {
+			e.put(key, p.getString(key, ""));
+		}
+
+		public void imp(String key) throws JSONException {
+			editor.putString(key, this.e.getString(key));
+		}
+	}
+
     protected class Perm {
         public String value;
         public int code;
@@ -191,8 +212,34 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 	public int exportProfiles() {
 		List<BackupItem> backups = mBackupHandler.getBackups();
 		
-		JSONArray profiles = new JSONArray();
+		JSONObject exportObj = new JSONObject();
 
+		/*
+		 * get global configs
+		 */
+		JSONObject globals = new JSONObject();
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		PrefExporter exporter = new PrefExporter(prefs, globals);
+		try {
+			for (String k : SettingsFragment.KEYS) {
+				exporter.exp(k);
+			}
+		} catch (JSONException e) {
+			Log.e(TAG, "ERROR exporting global configurations while creating json object: " + e.getMessage());
+			return -1;
+		}
+
+		try {
+			exportObj.put("globals", globals);
+		} catch (JSONException e) {
+			Log.e(TAG, "ERROR exporting globals while adding to exportObj: " + e.getMessage());
+			return -1;
+		}
+		
+		/*
+		 * get profile configs
+		 */
+		JSONArray profiles = new JSONArray();
 		try {
 			for (BackupItem i : backups) {
 				JSONObject p = new JSONObject();
@@ -215,9 +262,16 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 		}
 
 		try {
+			exportObj.put("profiles", profiles);
+		} catch (JSONException e) {
+			Log.e(TAG, "ERROR exporting profiles while adding to exportObj: " + e.getMessage());
+			return -1;
+		}
+
+		try {
 			File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "syncopoli_export.json");
 			FileOutputStream s = new FileOutputStream(f);
-			s.write(profiles.toString().getBytes());
+			s.write(exportObj.toString().getBytes());
 			s.close();
 		} catch (IOException e) {
 			Log.e(TAG, "ERROR exporting profiles while writing: " + e.getMessage());
@@ -251,7 +305,24 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 		}
 
 		try {
-			JSONArray profiles = new JSONArray(content);
+			JSONObject exportObj = new JSONObject(content);
+
+			/* globals */
+			JSONObject globals = exportObj.getJSONObject("globals");
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			PrefExporter importer = new PrefExporter(prefs, globals);
+
+			try {
+				for (String k : SettingsFragment.KEYS) {
+					importer.imp(k);
+				}
+			} catch (JSONException e) {
+				Log.e(TAG, "ERROR importing globals: " + e.getMessage());
+				return -1;
+			}
+
+			/* profiles */
+			JSONArray profiles = exportObj.getJSONArray("profiles");
 			for (int i = 0; i < profiles.length(); i++) {
 				JSONObject jb = profiles.getJSONObject(i);
 
@@ -445,3 +516,4 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 		return 0;
 	}
 }
+
