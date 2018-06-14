@@ -27,7 +27,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(KEY_WIFI_ONLY) || key.equals(KEY_RSYNC_PASSWORD)) {
+        if (key.equals(KEY_WIFI_ONLY)) {
             return;
         }
 
@@ -55,6 +55,17 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 					.edit()
 					.putString(KEY_PORT, Integer.toString(newport))
 					.apply();
+			}
+		}
+
+		/*
+		 * hide passwords from preference screen
+		 */
+		if (key.equals(KEY_SSH_PASSWORD) || key.equals(KEY_RSYNC_PASSWORD)) {
+			SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+			if (prefs.getString(key, "").length() > 0) {
+				Preference p = findPreference(key);
+				p.setSummary("******");
 			}
 		}
 
