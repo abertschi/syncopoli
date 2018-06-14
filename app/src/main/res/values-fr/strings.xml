@@ -38,7 +38,7 @@
     <string name="pref_title_protocol">Protocole</string>
     <string name="pref_default_protocol">Rsync</string>
     <string name="pref_title_port">Port</string>
-    <string name="pref_title_frequency">réquence (en heures)</string>
+    <string name="pref_title_frequency">Fréquence (en heures)</string>
     <string name="pref_title_rsync_password">Mot de passe rsync</string>
     <string name="pref_title_ssh_password">Mot de passe SSH</string>
     <string name="pref_title_wifi_only">Wifi uniquement</string>
