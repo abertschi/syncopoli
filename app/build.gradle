@@ -74,6 +74,16 @@ gradle.taskGraph.afterTask { task ->
 clean {
 	delete '.externalNativeBuild'
 }
+
+tasks.withType(Test) {
+    testLogging {
+        exceptionFormat 'full'
+        showCauses true
+        showExceptions true
+        showStackTraces true
+        showStandardStreams true
+    }
+}
 		
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
