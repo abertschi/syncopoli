@@ -321,16 +321,16 @@ public class BackupHandler implements IBackupHandler {
              * BUILD ARGUMENTS
              */
 
-            List<String> args = new ArrayList<>();
+            ArrayList<String> args = new ArrayList<>();
 
             args.add(f.getAbsolutePath());
 
             if (!rsync_options.equals("")) {
-                Collections.addAll(args, rsync_options.split(" "));
+				args.addAll(ArgumentTokenizer.tokenize(rsync_options));
             }
 
             if (!b.rsync_options.equals("")) {
-                Collections.addAll(args, b.rsync_options.split(" "));
+				args.addAll(ArgumentTokenizer.tokenize(b.rsync_options));
             }
 
             if (protocol.equals("SSH")) {
