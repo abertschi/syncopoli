@@ -14,7 +14,7 @@ public class BackupSyncOpenHelper extends SQLiteOpenHelper {
         db.execSQL("create table " + BackupSyncSchema.TABLE_NAME + " (" +
                    BackupSyncSchema.COLUMN_TYPE         + " text, " +
                    BackupSyncSchema.COLUMN_NAME         + " text, " +
-                   BackupSyncSchema.COLUMN_SOURCE       + " text, " +
+                   BackupSyncSchema.COLUMN_SOURCES      + " text, " +
                    BackupSyncSchema.COLUMN_DESTINATION  + " text, " +
                    BackupSyncSchema.COLUMN_LAST_UPDATE  + " text, " +
                    BackupSyncSchema.COLUMN_DIRECTION    + " text, " +

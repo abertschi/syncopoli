@@ -2,6 +2,7 @@ package org.amoradi.syncopoli;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.text.Format;
@@ -16,7 +17,7 @@ class BackupItem implements Parcelable {
     };
 
     public String name;
-    public String source;
+    public String[] sources;
     public String destination;
     public String logFileName;
     public Date lastUpdate;
@@ -28,9 +29,13 @@ class BackupItem implements Parcelable {
 		return 0;
 	}
 
+	public String getSourcesAsString() {
+		return TextUtils.join("\n", sources);
+	}
+
 	public void writeToParcel(Parcel out, int flags) {
         out.writeString(name);
-        out.writeString(source);
+        out.writeStringArray(sources);
         out.writeString(destination);
         out.writeString(logFileName);
 
@@ -61,7 +66,7 @@ class BackupItem implements Parcelable {
 		public BackupItem createFromParcel(Parcel in) {
 			BackupItem b = new BackupItem();
 			b.name = in.readString();
-			b.source = in.readString();
+			in.readStringArray(b.sources);
 			b.destination = in.readString();
 			b.logFileName = in.readString();
 

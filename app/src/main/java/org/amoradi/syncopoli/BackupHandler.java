@@ -47,7 +47,7 @@ public class BackupHandler implements IBackupHandler {
     }
 
     public int addBackup(BackupItem item) {
-        if (item.source.equals("") || item.name.equals("")) {
+        if (item.sources[0].equals("") || item.name.equals("")) {
             return -1;
         }
 
@@ -63,7 +63,7 @@ public class BackupHandler implements IBackupHandler {
         ContentValues values = new ContentValues();
         values.put(BackupSyncSchema.COLUMN_TYPE, "backup");
         values.put(BackupSyncSchema.COLUMN_NAME, item.name);
-        values.put(BackupSyncSchema.COLUMN_SOURCE, item.source);
+        values.put(BackupSyncSchema.COLUMN_SOURCES, item.getSourcesAsString());
         values.put(BackupSyncSchema.COLUMN_DESTINATION, item.destination);
         values.put(BackupSyncSchema.COLUMN_RSYNC_OPTIONS, item.rsync_options);
         values.put(BackupSyncSchema.COLUMN_LAST_UPDATE, "");
@@ -168,7 +168,7 @@ public class BackupHandler implements IBackupHandler {
         do {
             BackupItem x = new BackupItem();
             x.name = c.getString(c.getColumnIndex(BackupSyncSchema.COLUMN_NAME));
-            x.source = c.getString(c.getColumnIndex(BackupSyncSchema.COLUMN_SOURCE));
+            x.sources = c.getString(c.getColumnIndex(BackupSyncSchema.COLUMN_SOURCES)).split("\n");
             x.destination = c.getString(c.getColumnIndex(BackupSyncSchema.COLUMN_DESTINATION));
             x.rsync_options = c.getString(c.getColumnIndex(BackupSyncSchema.COLUMN_RSYNC_OPTIONS));
 
@@ -203,7 +203,7 @@ public class BackupHandler implements IBackupHandler {
         ContentValues values = new ContentValues();
         values.put(BackupSyncSchema.COLUMN_TYPE, "backup");
         values.put(BackupSyncSchema.COLUMN_NAME, b.name);
-        values.put(BackupSyncSchema.COLUMN_SOURCE, b.source);
+        values.put(BackupSyncSchema.COLUMN_SOURCES, b.getSourcesAsString());
         values.put(BackupSyncSchema.COLUMN_DESTINATION, b.destination);
         values.put(BackupSyncSchema.COLUMN_RSYNC_OPTIONS, b.rsync_options);
 
@@ -224,7 +224,7 @@ public class BackupHandler implements IBackupHandler {
         ContentValues values = new ContentValues();
         values.put(BackupSyncSchema.COLUMN_TYPE, "backup");
         values.put(BackupSyncSchema.COLUMN_NAME, b.name);
-        values.put(BackupSyncSchema.COLUMN_SOURCE, b.source);
+        values.put(BackupSyncSchema.COLUMN_SOURCES, b.getSourcesAsString());
         values.put(BackupSyncSchema.COLUMN_DESTINATION, b.destination);
         values.put(BackupSyncSchema.COLUMN_LAST_UPDATE, "");
         values.put(BackupSyncSchema.COLUMN_RSYNC_OPTIONS, b.rsync_options);
@@ -344,10 +344,12 @@ public class BackupHandler implements IBackupHandler {
                 }
 
                 if (b.direction == BackupItem.Direction.OUTGOING) {
-                    args.add(b.source);
+                    args.addAll(Arrays.asList(b.sources));
                     args.add(rsync_username + "@" + server_address + ":" + b.destination);
                 } else {
-                    args.add(rsync_username + "@" + server_address + ":" + b.source);
+                    for (String s : b.sources) {
+                        args.add(rsync_username + "@" + server_address + ":" + s);
+                    }
                     args.add(b.destination);
                 }
 
@@ -355,10 +357,12 @@ public class BackupHandler implements IBackupHandler {
 				args.add("--port=" + port);
 				
                 if (b.direction == BackupItem.Direction.OUTGOING) {
-                    args.add(b.source);
+                    args.addAll(Arrays.asList(b.sources));
                     args.add(rsync_username + "@" + server_address + "::" + b.destination);
                 } else {
-                    args.add(rsync_username + "@" + server_address + "::" + b.source);
+                    for (String s : b.sources) {
+                        args.add(rsync_username + "@" + server_address + "::" + s);
+                    }
                     args.add(b.destination);
                 }
             }
