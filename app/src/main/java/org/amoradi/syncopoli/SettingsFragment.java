@@ -96,15 +96,17 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 		 */
 		if (key.equals(KEY_SSH_PASSWORD) || key.equals(KEY_RSYNC_PASSWORD)) {
 			SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+            Preference p = findPreference(key);
 			if (prefs.getString(key, "").length() > 0) {
-				Preference p = findPreference(key);
 				p.setSummary("******");
-			}
-		}
-
-		Preference pref = findPreference(key);
-        String summary = sharedPreferences.getString(key, "Not set");
-        pref.setSummary(summary);
+			} else {
+                p.setSummary("");
+            }
+		} else {
+            Preference pref = findPreference(key);
+            String summary = sharedPreferences.getString(key, "Not set");
+            pref.setSummary(summary);
+        }
     }
 
     @Override
