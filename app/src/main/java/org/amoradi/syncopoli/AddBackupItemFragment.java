@@ -15,8 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import fr.ganfra.materialspinner.MaterialSpinner;
+import android.widget.Spinner;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -74,7 +73,7 @@ public class AddBackupItemFragment extends Fragment {
         });
 		*/
 
-        MaterialSpinner v_dir = (MaterialSpinner) v.findViewById(R.id.addbackupitem_direction);
+        Spinner v_dir = (Spinner) v.findViewById(R.id.addbackupitem_direction);
         String[] items = getResources().getStringArray(R.array.addbackupitem_direction_entries);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, items);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -135,7 +134,7 @@ public class AddBackupItemFragment extends Fragment {
             t = (EditText) v.findViewById(R.id.addbackupitem_rsync_options);
             i.rsync_options = t.getText().toString();
 
-            MaterialSpinner s = (MaterialSpinner) v.findViewById(R.id.addbackupitem_direction);
+            Spinner s = (Spinner) v.findViewById(R.id.addbackupitem_direction);
             if (s.getSelectedItemPosition() == 0) {
                 i.direction = BackupItem.Direction.INCOMING;
             } else {

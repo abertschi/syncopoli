@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:useDefaultMargins="true"
     android:layout_width="match_parent"
@@ -7,7 +8,7 @@
     android:orientation="vertical">
 
 
-    <fr.ganfra.materialspinner.MaterialSpinner
+    <Spinner
         android:id="@+id/addbackupitem_direction"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,7 +16,7 @@
         android:prompt="@string/addbackupitem_direction_prompt"
         app:ms_multiline="false"
         app:ms_hint="@string/addbackupitem_direction_prompt"
-        app:ms_enableFloatingLabel="true"
+        app:ms_enableFloatingLabel="false"
         app:ms_enableErrorLabel="false"
         app:ms_floatingLabelText="@string/addbackupitem_direction_prompt"/>
 
