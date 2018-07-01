@@ -13,13 +13,6 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.jcraft.jsch.HostKey;
-import com.jcraft.jsch.HostKeyRepository;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.UserInfo;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
