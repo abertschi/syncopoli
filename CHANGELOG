@@ -1,3 +1,12 @@
+v0.5
+----
+- add gitlab CI integration
+- add ability to enter multiple source directories (thank you pasdVn)
+- add ability to verify ssh host fingerprint using patched dropbear
+- add proper space and string handling in rsync options
+- add global configuration to exported config file
+- fix various typos and crashes
+
 v0.4.6
 ------
 - fix notification crash on API < 21
