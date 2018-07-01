@@ -200,9 +200,9 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         } else if (id == R.id.menu_settings) {
             setCurrentFragment(new SettingsFragment(), true);
 		} else if (id == R.id.menu_export) {
-			exportProfiles();
+			exportSettings();
 		} else if (id == R.id.menu_import) {
-			importProfiles();
+			importSettings();
         } else {
             return super.onOptionsItemSelected(item);
         }
@@ -210,10 +210,17 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         return true;
     }
 
-	public int exportProfiles() {
+	public int exportSettings() {
 		List<BackupItem> backups = mBackupHandler.getBackups();
 		
 		JSONObject exportObj = new JSONObject();
+
+        try {
+            exportObj.put("version", 2);
+        } catch (JSONException e) {
+            Log.e(TAG, "ERROR setting export version number: " + e.getMessage());
+            return -1;
+        }
 
 		/*
 		 * get global configs
@@ -282,7 +289,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 		return 0;
 	}
 
-	public int importProfiles() {
+	public int importSettings() {
 		String content;
 
 		try {
@@ -305,51 +312,128 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 			return -1;
 		}
 
-		try {
-			JSONObject exportObj = new JSONObject(content);
+        /* version 1 of export was an array of profiles
+         * starting with version 2, export config became an object
+         */
 
+        int ret = 0;
+
+        JSONObject exportedSettings = null;
+        JSONArray exportedSettingsV1 = null;
+
+        try {
+            exportedSettings = new JSONObject(content);
+        } catch (JSONException e) {
+            try {
+                exportedSettingsV1 = new JSONArray(content);
+            } catch (JSONException e2) {
+                Log.e(TAG, "ERROR importing profiles: could not parse export config: " +
+                      e2.getMessage());
+                return -1;
+            }
+        }
+
+        if (exportedSettingsV1 != null) {
+            ret = importSettingsV1(exportedSettingsV1);
+        } else {
+            int version = 0;
+            try {
+                version = exportedSettings.getInt("version");
+            } catch (JSONException e) {
+                Log.e(TAG, "ERROR importing profiles: could not read version number: " +
+                      e.getMessage());
+                return -1;
+            }
+            
+            if (version == 2) {
+                ret = importSettingsV2(exportedSettings);
+            } else {
+                Log.e(TAG, "ERROR importing profiles: unknown version number");
+                return -1;
+            }
+        }
+
+        if (ret == 0) {
+            updateBackupList();
+            Toast.makeText(getApplicationContext(), "Import successful", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Import failed, see logcat for details", Toast.LENGTH_LONG).show();
+        }
+
+        return ret;
+    }
+
+    public int importProfileList(JSONArray profiles) {
+        try {
+            /* profiles */
+            for (int i = 0; i < profiles.length(); i++) {
+                JSONObject jb = profiles.getJSONObject(i);
+
+                BackupItem b = new BackupItem();
+                b.name = jb.getString("name");
+                b.source = jb.getString("source");
+                b.destination = jb.getString("destination");
+                b.rsync_options = jb.getString("rsync_options");
+
+                if (jb.getString("direction").equals("INCOMING")) {
+                    b.direction = BackupItem.Direction.INCOMING;
+                } else {
+                    b.direction = BackupItem.Direction.OUTGOING;
+                }
+
+                mBackupHandler.addBackup(b);
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, "ERROR import profiles: " + e.getMessage());
+            return -1;
+        }
+
+        return 0;
+    }
+
+    public int importGlobalSettings(JSONObject globals) {
+		try {
 			/* globals */
-			JSONObject globals = exportObj.getJSONObject("globals");
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 			PrefExporter importer = new PrefExporter(prefs, globals);
 
-			try {
-				for (String k : SettingsFragment.KEYS) {
-					importer.imp(k);
-				}
-			} catch (JSONException e) {
-				Log.e(TAG, "ERROR importing globals: " + e.getMessage());
-				return -1;
-			}
+            for (String k : SettingsFragment.KEYS) {
+                importer.imp(k);
+            }
 
-			/* profiles */
-			JSONArray profiles = exportObj.getJSONArray("profiles");
-			for (int i = 0; i < profiles.length(); i++) {
-				JSONObject jb = profiles.getJSONObject(i);
-
-				BackupItem b = new BackupItem();
-				b.name = jb.getString("name");
-				b.source = jb.getString("source");
-				b.destination = jb.getString("destination");
-				b.rsync_options = jb.getString("rsync_options");
-
-				if (jb.getString("direction").equals("INCOMING")) {
-					b.direction = BackupItem.Direction.INCOMING;
-				} else {
-					b.direction = BackupItem.Direction.OUTGOING;
-				}
-
-				mBackupHandler.addBackup(b);
-			}
 		} catch (JSONException e) {
-			Log.e(TAG, "ERROR importing profiles while recreating json: " + e.getMessage());
+			Log.e(TAG, "ERROR importing globals: " + e.getMessage());
 			return -1;
 		}
 
-		updateBackupList();
-		Toast.makeText(getApplicationContext(), "Import successful", Toast.LENGTH_SHORT).show();
-		return 0;
-	}
+        return 0;
+    }
+
+    public int importSettingsV1(JSONArray profiles) {
+        return importProfileList(profiles);
+    }
+
+    public int importSettingsV2(JSONObject obj) {
+        JSONObject globals = null;
+        JSONArray profiles = null;
+        try {
+            globals = obj.getJSONObject("globals");
+            profiles = obj.getJSONArray("profiles");
+        } catch (JSONException e) {
+            Log.e(TAG, "ERROR import version 2 profiles: " + e.getMessage());
+            return -1;
+        }
+        
+        if (importGlobalSettings(globals) != 0) {
+            return -1;
+        }
+
+        if (importProfileList(profiles) != 0) {
+            return -1;
+        }
+
+        return 0;
+    }
 
     public int addBackup(BackupItem item) {
         if (mBackupHandler.addBackup(item) == BackupHandler.ERROR_BACKUP_EXISTS) {
