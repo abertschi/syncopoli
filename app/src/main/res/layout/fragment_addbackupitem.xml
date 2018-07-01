@@ -14,11 +14,7 @@
         android:layout_height="wrap_content"
         android:entries="@array/addbackupitem_direction_entries"
         android:prompt="@string/addbackupitem_direction_prompt"
-        app:ms_multiline="false"
-        app:ms_hint="@string/addbackupitem_direction_prompt"
-        app:ms_enableFloatingLabel="false"
-        app:ms_enableErrorLabel="false"
-        app:ms_floatingLabelText="@string/addbackupitem_direction_prompt"/>
+        style="@style/Widget.AppCompat.Spinner.Underlined"/>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/addbackupitem_name_layout"
