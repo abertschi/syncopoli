@@ -12,12 +12,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:entries="@array/addbackupitem_direction_entries"
-        android:prompt="@string/addbackupitem_direction_prompt"/>
+        android:prompt="@string/addbackupitem_direction_prompt"
         app:ms_multiline="false"
-        app:ms_hint="hint"
+        app:ms_hint="@string/addbackupitem_direction_prompt"
         app:ms_enableFloatingLabel="true"
         app:ms_enableErrorLabel="false"
-        app:ms_floatingLabelText="@string/addbackupitem_direction_prompt"
+        app:ms_floatingLabelText="@string/addbackupitem_direction_prompt"/>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/addbackupitem_name_layout"
