@@ -30,12 +30,22 @@ class BackupItem implements Parcelable {
 	}
 
 	public String getSourcesAsString() {
-		return TextUtils.join("\n", sources);
-	}
+        if (sources != null) {
+            return TextUtils.join("\n", sources);
+        } else {
+            return "";
+        }
+    }
 
-	public void writeToParcel(Parcel out, int flags) {
+    public void writeToParcel(Parcel out, int flags) {
         out.writeString(name);
-        out.writeStringArray(sources);
+
+        if (sources != null) {
+            out.writeStringArray(sources);
+        } else {
+            out.writeStringArray(new String[0]);
+        }
+
         out.writeString(destination);
         out.writeString(logFileName);
 
@@ -66,7 +76,7 @@ class BackupItem implements Parcelable {
 		public BackupItem createFromParcel(Parcel in) {
 			BackupItem b = new BackupItem();
 			b.name = in.readString();
-			in.readStringArray(b.sources);
+			b.sources = in.createStringArray();
 			b.destination = in.readString();
 			b.logFileName = in.readString();
 
