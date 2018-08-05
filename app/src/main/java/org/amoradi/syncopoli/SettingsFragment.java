@@ -1,5 +1,6 @@
 package org.amoradi.syncopoli;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -91,7 +92,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 			}
 		}
 
-		/*
+        if (key.equals(KEY_FREQUENCY)) {
+            ((BackupActivity)getActivity()).setupSyncAccount();
+        }
+
+        /*
 		 * hide passwords from preference screen
 		 */
 		if (key.equals(KEY_SSH_PASSWORD) || key.equals(KEY_RSYNC_PASSWORD)) {

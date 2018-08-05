@@ -85,7 +85,6 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         new Perm(android.Manifest.permission.ACCESS_WIFI_STATE, 6)
     };
 
-    Account mAccount;
     BackupHandler mBackupHandler;
 
     @Override
@@ -101,19 +100,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
             checkRuntimePerms();
         }
 
-        mAccount = createSyncAccount(this);
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        long freq = Long.parseLong(prefs.getString(SettingsFragment.KEY_FREQUENCY, "8"));
-        freq = freq * 3600; // hours to seconds
-
-        // ContentResolver.addPeriodicSync enforces a min of 1 hour
-        if (freq == 0) {
-            ContentResolver.removePeriodicSync(mAccount, SYNC_AUTHORITY, new Bundle());
-        } else {
-            ContentResolver.addPeriodicSync(mAccount, SYNC_AUTHORITY, new Bundle(), freq);
-        }
-
+        setupSyncAccount();
         copyExecutables();
         ensureSSHDir();
 
@@ -152,16 +139,39 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         setSupportActionBar(t);
     }
 
-    public static Account createSyncAccount(Context ctx) {
+    public Account getOrCreateSyncAccount() {
+        /* get */
+        AccountManager accman = AccountManager.get(this);
+
+        for (Account acc : accman.getAccountsByType(SYNC_ACCOUNT_TYPE)) {
+            if (acc.name.equals(SYNC_ACCOUNT_NAME)) {
+                return acc;
+            }
+        }
+
+        /* if not found, create */
         Account acc = new Account(SYNC_ACCOUNT_NAME, SYNC_ACCOUNT_TYPE);
-        AccountManager accman = AccountManager.get(ctx);
 
         if (accman.addAccountExplicitly(acc, null, null)) {
             ContentResolver.setIsSyncable(acc, SYNC_AUTHORITY, 1);
-            ContentResolver.setSyncAutomatically(acc, SYNC_AUTHORITY, true);
         }
 
         return acc;
+    }
+        
+    public void setupSyncAccount() {
+        Account acc = getOrCreateSyncAccount();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        long freq = Long.parseLong(prefs.getString(SettingsFragment.KEY_FREQUENCY, "8"));
+        freq = freq * 3600; // hours to seconds
+
+        // ContentResolver.addPeriodicSync enforces a min of 1 hour
+        if (freq == 0) {
+            ContentResolver.removePeriodicSync(acc, SYNC_AUTHORITY, new Bundle());
+        } else {
+            ContentResolver.addPeriodicSync(acc, SYNC_AUTHORITY, new Bundle(), freq);
+        }
     }
 
     @Override
