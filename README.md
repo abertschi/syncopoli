@@ -65,6 +65,23 @@ You have to have `gradle` installed. See [gradle.org](https://gradle.org) or you
 
 Starting with v0.4.5.4, you need `gradle 4.4.1`, `build-tools 27.0.3`, and `ndk-tools r15c`.
 
+How to get the latest debug build
+---------------------------------
+`gitlab.com/fengshaun/syncopoli` -> CI/CD -> Pipelines -> on the right side, download artifacts. There is a file name apk-debug.apk.
+
+How to install apk
+------------------
+`adb install <apk>`
+
+How to get logcat output for bug report
+---------------------------------------
+Run syncopoli on your phone, then run the following command
+```
+$ adb logcat --pid=$(adb shell "pidof org.amoradi.syncopoli")
+```
+
+Paste the output in the bug report
+
 FAQ
 ---
 
