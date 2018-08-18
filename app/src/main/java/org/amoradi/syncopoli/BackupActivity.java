@@ -385,14 +385,20 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
             /* profiles */
             for (int i = 0; i < profiles.length(); i++) {
                 JSONObject jb = profiles.getJSONObject(i);
-
                 BackupItem b = new BackupItem();
+
                 b.name = jb.getString("name");
 
-                JSONArray sources = jb.getJSONArray("sources");
-                b.sources = new String[sources.length()];
-                for (int k= 0; k < sources.length(); k++) {
-                    b.sources[k] = sources.getString(k);
+                JSONArray sources = jb.optJSONArray("sources");
+                if (sources != null) {
+                    b.sources = new String[sources.length()];
+                    for (int k= 0; k < sources.length(); k++) {
+                        b.sources[k] = sources.getString(k);
+                    }
+                } else {
+                    // compatibility with v1 config where sources was source
+                    b.sources = new String[1];
+                    b.sources[0] = jb.getString("source");
                 }
 
                 b.destination = jb.getString("destination");
