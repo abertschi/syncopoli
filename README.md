@@ -75,9 +75,12 @@ How to install apk
 
 How to get logcat output for bug report
 ---------------------------------------
-Run syncopoli on your phone, then run the following command
+Run syncopoli on your phone, then run the following commands:
 ```
-$ adb logcat --pid=$(adb shell "pidof org.amoradi.syncopoli")
+# to get the pid of syncopoli
+$ adb shell "pidof org.amoradi.syncopoli"
+# to get the logcat for syncopoli
+$ adb logcat --pid=<the number you got from above command>
 ```
 
 Paste the output in the bug report
