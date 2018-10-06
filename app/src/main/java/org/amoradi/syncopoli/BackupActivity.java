@@ -58,11 +58,19 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 		}
 
 		public void exp(String key) throws JSONException {
-			e.put(key, p.getString(key, ""));
+            if (key.equals(SettingsFragment.KEY_WIFI_ONLY)) {
+                e.put(key, p.getBoolean(key, false));
+            } else {
+                e.put(key, p.getString(key, ""));
+            }
 		}
 
 		public void imp(String key) throws JSONException {
-			editor.putString(key, this.e.getString(key));
+            if (key.equals(SettingsFragment.KEY_WIFI_ONLY)) {
+                editor.putBoolean(key, this.e.getBoolean(key));
+            } else {
+                editor.putString(key, this.e.getString(key));
+            }
 		}
 	}
 
