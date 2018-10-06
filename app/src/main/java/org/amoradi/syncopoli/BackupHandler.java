@@ -185,7 +185,6 @@ public class BackupHandler implements IBackupHandler {
                 x.lastUpdate = null;
             }
 
-            x.logFileName = Uri.encode("log_" + x.name);
             bl.add(x);
         } while(c.moveToNext());
 
@@ -251,7 +250,7 @@ public class BackupHandler implements IBackupHandler {
             String rsyncPath = new File(mContext.getFilesDir(), "rsync").getAbsolutePath();
             String sshPath = new File(mContext.getFilesDir(), "ssh").getAbsolutePath();
 
-            FileOutputStream logFile = mContext.openFileOutput(b.logFileName, Context.MODE_PRIVATE);
+            FileOutputStream logFile = mContext.openFileOutput(b.getLogFileName(), Context.MODE_PRIVATE);
 
             updateBackupTimestamp(b);
             logFile.write((b.lastUpdate.toString() + " \n\n").getBytes());

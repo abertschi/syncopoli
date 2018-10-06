@@ -37,7 +37,7 @@ public class BackupLogFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_backuplog, container, false);
         if (mBackupItem != null) {
             mFileLine = 0;
-            ((TextView) v.findViewById(R.id.backuplog_textview)).setText(getLogString(mBackupItem.logFileName));
+            ((TextView) v.findViewById(R.id.backuplog_textview)).setText(getLogString(mBackupItem.getLogFileName()));
         } else {
             ((TextView) v.findViewById(R.id.backuplog_textview)).setText("mBackupItem is null");
         }
@@ -58,7 +58,7 @@ public class BackupLogFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_refresh) {
-            ((TextView) getView().findViewById(R.id.backuplog_textview)).setText(getLogString(mBackupItem.logFileName));
+            ((TextView) getView().findViewById(R.id.backuplog_textview)).setText(getLogString(mBackupItem.getLogFileName()));
             ((ScrollView) getView().findViewById(R.id.backuplog_scrollview)).fullScroll(View.FOCUS_DOWN);
         } else {
             return super.onOptionsItemSelected(item);

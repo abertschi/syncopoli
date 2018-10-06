@@ -1,5 +1,6 @@
 package org.amoradi.syncopoli;
 
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -19,13 +20,16 @@ class BackupItem implements Parcelable {
     public String name;
     public String[] sources;
     public String destination;
-    public String logFileName;
     public Date lastUpdate;
     public Direction direction;
 
     public String rsync_options;
 
-	public int describeContents() {
+    public String getLogFileName() {
+        return Uri.encode("log_" + this.name);
+    }
+
+    public int describeContents() {
 		return 0;
 	}
 
@@ -47,7 +51,6 @@ class BackupItem implements Parcelable {
         }
 
         out.writeString(destination);
-        out.writeString(logFileName);
 
         Format ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -78,7 +81,6 @@ class BackupItem implements Parcelable {
 			b.name = in.readString();
 			b.sources = in.createStringArray();
 			b.destination = in.readString();
-			b.logFileName = in.readString();
 
 			SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String x = in.readString();
