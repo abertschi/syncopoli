@@ -220,7 +220,12 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         } else if (id == R.id.menu_settings) {
             setCurrentFragment(new SettingsFragment(), true);
 		} else if (id == R.id.menu_export) {
-			exportSettings();
+			if (exportSettings() == 0) {
+			    File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "syncopoli_export.json");
+                Toast.makeText(getApplicationContext(), "Exported " + f.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+            } else {
+			    Toast.makeText(getApplicationContext(), "Export failed, see logcat for details", Toast.LENGTH_LONG).show();
+            }
 		} else if (id == R.id.menu_import) {
 			importSettings();
         } else {
