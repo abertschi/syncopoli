@@ -162,6 +162,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 
         if (accman.addAccountExplicitly(acc, null, null)) {
             ContentResolver.setIsSyncable(acc, SYNC_AUTHORITY, 1);
+            ContentResolver.setSyncAutomatically(acc, SYNC_AUTHORITY, true);
         }
 
         return acc;
