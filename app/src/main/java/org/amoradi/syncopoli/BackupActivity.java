@@ -45,35 +45,6 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
     public static final String SYNC_ACCOUNT_NAME = "Syncopoli Sync Account";
     public static final String SYNC_ACCOUNT_TYPE = "org.amoradi.syncopoli";
 
-	class PrefExporter {
-		private JSONObject e;
-		private SharedPreferences p;
-		private SharedPreferences.Editor editor;
-
-		PrefExporter(SharedPreferences p, JSONObject e) {
-			this.p = p;
-			this.e = e;
-
-			editor = p.edit();
-		}
-
-		public void exp(String key) throws JSONException {
-            if (key.equals(SettingsFragment.KEY_WIFI_ONLY)) {
-                e.put(key, p.getBoolean(key, false));
-            } else {
-                e.put(key, p.getString(key, ""));
-            }
-		}
-
-		public void imp(String key) throws JSONException {
-            if (key.equals(SettingsFragment.KEY_WIFI_ONLY)) {
-                editor.putBoolean(key, this.e.getBoolean(key));
-            } else {
-                editor.putString(key, this.e.getString(key));
-            }
-		}
-	}
-
     protected class Perm {
         public String value;
         public int code;
@@ -253,10 +224,13 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 		 */
 		JSONObject globals = new JSONObject();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		PrefExporter exporter = new PrefExporter(prefs, globals);
 		try {
 			for (String k : SettingsFragment.KEYS) {
-				exporter.exp(k);
+                if (k.equals(SettingsFragment.KEY_WIFI_ONLY)) {
+                    globals.put(k, prefs.getBoolean(k, false));
+                } else {
+                    globals.put(k, prefs.getString(k, ""));
+                }
 			}
 		} catch (JSONException e) {
 			Log.e(TAG, "ERROR exporting global configurations while creating json object: " + e.getMessage());
@@ -439,11 +413,17 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 		try {
 			/* globals */
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-			PrefExporter importer = new PrefExporter(prefs, globals);
+			SharedPreferences.Editor editor = prefs.edit();
 
             for (String k : SettingsFragment.KEYS) {
-                importer.imp(k);
+                if (k.equals(SettingsFragment.KEY_WIFI_ONLY)) {
+                    editor.putBoolean(k, globals.getBoolean(k));
+                } else {
+                    editor.putString(k, globals.getString(k));
+                }
             }
+
+            editor.apply();
 
 		} catch (JSONException e) {
 			Log.e(TAG, "ERROR importing globals: " + e.getMessage());
