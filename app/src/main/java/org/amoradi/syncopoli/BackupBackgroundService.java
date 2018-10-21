@@ -9,8 +9,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.NotificationCompat;
+import android.util.Log;
 
 public class BackupBackgroundService extends IntentService {
+    public final static String TAG = "Syncopoli";
+
     public BackupBackgroundService() {
         super("BackupBackgroundService");
         setIntentRedelivery(true);
@@ -19,24 +22,34 @@ public class BackupBackgroundService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent work) {
 		Bundle bundle = work.getExtras();
+		Boolean force = bundle.getBoolean("force");
+
+		BackupHandler h = new BackupHandler(getApplicationContext());
+
+		if (!force) {
+			if(!h.canRunBackup()) {
+				Log.d(TAG, "Not allowed to run backup due to configuration restriction");
+				return;
+			}
+		} else {
+			Log.d(TAG, "Forced sync - ignoring configuration restrictions");
+		}
+
 		BackupItem b = bundle.getParcelable("item");
 
         if (b != null) {
-            runTask(b);
+            runTask(h, b);
             return;
         }
 
         Parcelable[] ps = bundle.getParcelableArray("items");
         for (Parcelable x : ps) {
             BackupItem y = (BackupItem) x;
-            runTask(y);
+            runTask(h, y);
         }
-
 	}
 
-    private void runTask(BackupItem b) {
-
-		BackupHandler h = new BackupHandler(getApplicationContext());
+    private void runTask(BackupHandler h, BackupItem b) {
 		int ret = h.runBackup(b);
 
 		int notif_icon = R.drawable.ic_action_refresh;

@@ -244,11 +244,6 @@ public class BackupHandler implements IBackupHandler {
     }
 
     public int runBackup(BackupItem b) {
-        if (!canRunBackup()) {
-            Log.d(TAG, "Not allowed to run backup due to configuration restriction");
-            return ERROR_DONOTRUN;
-        }
-
         try {
             String rsyncPath = new File(mContext.getFilesDir(), "rsync").getAbsolutePath();
             Log.d(TAG, "rsyncPath: " + rsyncPath);
