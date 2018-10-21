@@ -16,6 +16,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SSHManager {
+    private static final String TAG = "Syncopoli";
+
     private Context mContext;
 
     /* This needs the patched version of dropbear!
@@ -38,7 +40,7 @@ public class SSHManager {
         try {
             Integer.parseInt(port);
         } catch (java.lang.NumberFormatException e) {
-            Log.e("Syncopoli", "Could not convert port to integer: " + e.toString());
+            Log.e(TAG, "Could not convert port to integer: " + e.toString());
             throw e;
         }
     }
@@ -73,7 +75,7 @@ public class SSHManager {
         try {
             process = pb.start();
         } catch (IOException e) {
-            Log.e("Syncopoli", "Could not run ssh: " + e.toString());
+            Log.e(TAG, "Could not run ssh: " + e.toString());
             return null;
         }
 
@@ -87,28 +89,28 @@ public class SSHManager {
         /* Read STDOUT & STDERR */
         try {
             while ((temp = reader.readLine()) != null) {
-                Log.e("BackupHandler", temp + "\n");
+                Log.e(TAG, temp + "\n");
 
                 Matcher m = mFingerprintPattern.matcher(temp);
                 if (m.matches()) {
-                    Log.e("Syncopoli", "MATCHES FINGERPRINT: " + m.group(1));
+                    Log.e(TAG, "MATCHES FINGERPRINT: " + m.group(1));
                     String fp = m.group(1);
 
                     try {
                         process.waitFor();
                     } catch (InterruptedException e) {
-                        Log.e("Syncopoli", e.toString());
+                        Log.e(TAG, e.toString());
                     }
 
                     return fp;
                 }
             }
         } catch (IOException e) {
-            Log.e("Syncopoli", "Could not read/write from ssh process");
+            Log.e(TAG, "Could not read/write from ssh process");
             return null;
         }
 
-        Log.e("Syncopoli", "Unknown error occurred when trying to communicate with ssh process");
+        Log.e(TAG, "Unknown error occurred when trying to communicate with ssh process");
         return null;
     }
 
@@ -143,7 +145,7 @@ public class SSHManager {
         try {
             process = pb.start();
         } catch (IOException e) {
-            Log.e("Syncopoli", "Could not run ssh: " + e.toString());
+            Log.e(TAG, "Could not run ssh: " + e.toString());
             return false;
         }
 
@@ -157,27 +159,27 @@ public class SSHManager {
         /* Read STDOUT & STDERR */
         try {
             while ((temp = reader.readLine()) != null) {
-                Log.e("BackupHandler", temp + "\n");
+                Log.e(TAG, temp + "\n");
 
                 Matcher m = mAcceptedPattern.matcher(temp);
                 if (m.matches()) {
-                    Log.e("Syncopoli", "Fingerprint accepted");
+                    Log.e(TAG, "Fingerprint accepted");
 
                     try {
                         process.waitFor();
                     } catch (InterruptedException e) {
-                        Log.e("Syncopoli", e.toString());
+                        Log.e(TAG, e.toString());
                     }
 
                     return true;
                 }
             }
         } catch (IOException e) {
-            Log.e("Syncopoli", "Could not read/write from ssh process");
+            Log.e(TAG, "Could not read/write from ssh process");
             return false;
         }
 
-        Log.e("Syncopoli", "Unknown error occurred when trying to communicate with ssh process");
+        Log.e(TAG, "Unknown error occurred when trying to communicate with ssh process");
         return false;
     }
 }

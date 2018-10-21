@@ -12,6 +12,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 class BackupItem implements Parcelable {
+    private static final String TAG = "Syncopoli";
+
     public enum Direction {
         INCOMING,
         OUTGOING
@@ -87,7 +89,7 @@ class BackupItem implements Parcelable {
 			try {
 				b.lastUpdate = ft.parse(x);
 			} catch (ParseException e) {
-				Log.e("BackupItem", "Could not parse date string from parcelable: " + x);
+				Log.e(TAG, "Could not parse date string from parcelable: " + x);
 				b.lastUpdate = new Date();
 			}
 

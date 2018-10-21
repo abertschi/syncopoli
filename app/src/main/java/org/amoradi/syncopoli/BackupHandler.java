@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.Properties;
 
 public class BackupHandler implements IBackupHandler {
+    private static final String TAG = "Syncopoli";
+
     private List<BackupItem> mBackupItems;
     Context mContext;
 
@@ -243,12 +245,15 @@ public class BackupHandler implements IBackupHandler {
 
     public int runBackup(BackupItem b) {
         if (!canRunBackup()) {
+            Log.d(TAG, "Not allowed to run backup due to configuration restriction");
             return ERROR_DONOTRUN;
         }
 
         try {
             String rsyncPath = new File(mContext.getFilesDir(), "rsync").getAbsolutePath();
+            Log.d(TAG, "rsyncPath: " + rsyncPath);
             String sshPath = new File(mContext.getFilesDir(), "ssh").getAbsolutePath();
+            Log.d(TAG, "sshPath: " + rsyncPath);
 
             FileOutputStream logFile = mContext.openFileOutput(b.getLogFileName(), Context.MODE_PRIVATE);
 
@@ -366,6 +371,8 @@ public class BackupHandler implements IBackupHandler {
                 }
             }
 
+            Log.d(TAG, "rsync exec: " + args.toString());
+
             /*
              * BUILD PROCESS
              */
@@ -401,7 +408,7 @@ public class BackupHandler implements IBackupHandler {
 
             /* Read STDOUT & STDERR */
             while ((temp = reader.readLine()) != null) {
-                Log.v("BackupHandler", temp + "\n");
+                Log.v(TAG, temp + "\n");
                 logFile.write((temp + "\n").getBytes());
             }
             reader.close();
@@ -441,7 +448,7 @@ public class BackupHandler implements IBackupHandler {
 
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         if (wifiInfo == null) {
-            Log.e("Syncopoli_BackupHandler", "Cannot get Wifi info from WifiManager");
+            Log.e(TAG, "Cannot get Wifi info from WifiManager");
             return false;
         }
 

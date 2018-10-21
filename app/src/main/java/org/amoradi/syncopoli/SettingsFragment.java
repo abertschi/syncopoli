@@ -29,6 +29,8 @@ import java.util.regex.Pattern;
 
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private static final String TAG = "Syncopoli";
+
     public final static String KEY_SERVER_ADDRESS = "pref_key_server_address"; // String
     public final static String KEY_PROTOCOL = "pref_key_protocol"; // String
     public final static String KEY_RSYNC_USERNAME = "pref_key_username"; // String
@@ -171,9 +173,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         @Override
         protected void onPostExecute(Boolean result) {
 		    if (result) {
-		        Log.i("Syncopoli", "Remote host fingerprint accepted");
+		        Log.i(TAG, "Remote host fingerprint accepted");
             } else {
-                Log.e("Syncopoli", "Could not accept remote host fingerprint");
+                Log.e(TAG, "Could not accept remote host fingerprint");
                 Toast.makeText(mContext, "Could not accept remote host fingerprint, please see logcat for details", Toast.LENGTH_LONG).show();
             }
         }

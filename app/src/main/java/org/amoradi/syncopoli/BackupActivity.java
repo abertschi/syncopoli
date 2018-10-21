@@ -39,7 +39,7 @@ import java.util.List;
 import org.json.*;
 
 public class BackupActivity extends AppCompatActivity implements IBackupHandler {
-    private static final String TAG = "Syncopoli_BackupActivity";
+    private static final String TAG = "Syncopoli";
 
     public static final String SYNC_AUTHORITY = "org.amoradi.syncopoli.provider";
     public static final String SYNC_ACCOUNT_NAME = "Syncopoli Sync Account";
@@ -649,18 +649,18 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         File f = new File(getFilesDir(), ".ssh");
         if (!f.exists()) {
             if (!f.mkdirs()) {
-                Log.e("Syncopoli", "Could not create directory " + f.getAbsolutePath());
+                Log.e(TAG, "Could not create directory " + f.getAbsolutePath());
                 return -1;
             }
         }
 
         if (!f.isDirectory()) {
-            Log.e("Syncopoli", f.getAbsolutePath() + " is not a directory");
+            Log.e(TAG, f.getAbsolutePath() + " is not a directory");
             return -1;
         }
 
         if (!f.canWrite()) {
-            Log.e("Syncopoli", f.getAbsolutePath() + " is not writable");
+            Log.e(TAG, f.getAbsolutePath() + " is not writable");
             return -1;
         }
 
@@ -669,21 +669,21 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         if (!f2.exists()) {
             try {
                 if (!f2.createNewFile()) {
-                    Log.e("Syncopoli", "Could not create file " + f2.getAbsolutePath());
+                    Log.e(TAG, "Could not create file " + f2.getAbsolutePath());
                     return -1;
                 }
             } catch (IOException e) {
-                Log.e("Syncopoli", "Could not create file " + f2.getAbsolutePath() + ": " + e.toString());
+                Log.e(TAG, "Could not create file " + f2.getAbsolutePath() + ": " + e.toString());
             }
         }
 
         if (!f2.isFile()) {
-            Log.e("Syncopoli", f2.getAbsolutePath() + " is not a file");
+            Log.e(TAG, f2.getAbsolutePath() + " is not a file");
             return -1;
         }
 
         if (!f2.canWrite()) {
-            Log.e("Syncopoli", "file " + f2.getAbsolutePath() + " is not writable");
+            Log.e(TAG, "file " + f2.getAbsolutePath() + " is not writable");
             return -1;
         }
 
