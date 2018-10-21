@@ -443,6 +443,7 @@ public class BackupHandler implements IBackupHandler {
 
         WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
         if (!wifiManager.isWifiEnabled()) {
+            Log.d(TAG, "Wifi not enabled");
             return false;
         }
 
@@ -454,6 +455,7 @@ public class BackupHandler implements IBackupHandler {
 
         SupplicantState state = wifiInfo.getSupplicantState();
         if (state != SupplicantState.COMPLETED) {
+            Log.d(TAG, "SupplicantState.COMPLETED is false");
             return false;
         }
 
@@ -466,8 +468,10 @@ public class BackupHandler implements IBackupHandler {
             ssid = ssid.replaceAll("^\"|\"$", "");
         }
 
+        Log.d(TAG, "ssid: " + ssid);
         for (String name : wifi_name.split(";")) {
             if (ssid.equals(name)) {
+                Log.d(TAG, ssid + " matches " + name);
                 return true;
             }
         }

@@ -3,6 +3,15 @@ Syncopoli - Rsync for Android
 
 [<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="60">](https://f-droid.org/app/org.amoradi.syncopoli)
 
+Permissions
+-----------
+* `READ_EXTERNAL_STORAGE`: for local to remote syncs.
+* `WRITE_EXTERNAL_STORAGE`: for remote to local syncs.
+* `READ_SYNC_SETTINGS`, `WRITE_SYNC_SETTINGS`: to set up automatic sync.
+* `INTERNET`: rsync needs network access.
+* `ACCESS_WIFI_STATE`: get wifi SSID for `Wifi only` setting.
+* `ACCESS_COARSE_LOCATION`: unfortunately, Android 8.1+ now mandates this permission AND enabling location services for apps to get the SSID. So, if you are running Android 8.1 and above and want your profiles to sync only when you're connected to a specific SSID, this permission AND enabling location services is required.
+
 Global Options
 --------------
 * Server address - The IP address of your server

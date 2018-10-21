@@ -90,7 +90,8 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         new Perm(android.Manifest.permission.READ_SYNC_SETTINGS, 3),
         new Perm(android.Manifest.permission.WRITE_SYNC_SETTINGS, 4),
         new Perm(android.Manifest.permission.INTERNET, 5),
-        new Perm(android.Manifest.permission.ACCESS_WIFI_STATE, 6)
+        new Perm(android.Manifest.permission.ACCESS_WIFI_STATE, 6),
+        new Perm(android.Manifest.permission.ACCESS_COARSE_LOCATION, 7)
     };
 
     BackupHandler mBackupHandler;
