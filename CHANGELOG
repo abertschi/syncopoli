@@ -1,3 +1,13 @@
+v0.5.1
+------
+- show toast notification with path of exported config
+- add ability to bypass ssid filter when manually syncing
+- add more debug statements to ease troubleshooting
+- revert to android target api 25 to avoid backgroundservice issues on Android 8.1
+- fix wifi-only issues with Android 8.1 (needs location permission)
+- fix crash when exporting
+- fix import properly applying global options
+
 v0.5
 ----
 - add gitlab CI integration
