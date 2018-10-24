@@ -43,6 +43,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public final static String KEY_WIFI_ONLY = "pref_key_wifi_only"; // boolean
     public final static String KEY_WIFI_NAME = "pref_key_wifi_name"; // String
     public final static String KEY_VERIFY_HOST = "pref_key_verify_host"; // String
+    public final static String KEY_VERSION_CODE = "pref_key_version_code";
 
 	private final static int DEFAULT_RSYNC_PORT = 873;
 	private final static int DEFAULT_SSH_PORT = 22;

@@ -80,15 +80,37 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
             checkRuntimePerms();
         }
 
-        setupSyncAccount();
-        copyExecutables();
-        ensureSSHDir();
+        if (isFirstRun()) {
+            setupSyncAccount();
+
+            if (copyExecutables() != 0) {
+                Toast.makeText(getApplicationContext(), "Unable to copy ssh and/or rsync executables. Please submit a bug report.", Toast.LENGTH_LONG).show();
+            }
+            
+            if (ensureSSHDir() != 0) {
+                Toast.makeText(getApplicationContext(), "Unable to create .ssh directory. Please submit a bug report.", Toast.LENGTH_LONG).show();
+            }
+        }
+
 
         mBackupHandler = new BackupHandler(this);
 
         BackupListFragment f = new BackupListFragment();
         f.setBackupHandler(this);
         setCurrentFragment(f, false);
+    }
+
+    private boolean isFirstRun() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int savedVersionCode = prefs.getInt(SettingsFragment.KEY_VERSION_CODE, -1);
+
+        boolean isFirst = BuildConfig.VERSION_CODE != savedVersionCode;
+
+        if (isFirst) {
+            prefs.edit().putInt(SettingsFragment.KEY_VERSION_CODE, BuildConfig.VERSION_CODE).apply();
+        }
+
+        return isFirst;
     }
 
     protected boolean checkRuntimePerms() {
@@ -562,12 +584,9 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
     }
 
     public int copyExecutable(String filename) {
+        // copy and overwrite
+        
         File file = getFileStreamPath(filename);
-
-        // @todo: what about updated native executables?
-        if (file.exists()) {
-            return 0;
-        }
 
 		String[] abis = {Build.CPU_ABI, Build.CPU_ABI2};
 		if (Build.VERSION.SDK_INT >= 21) {
