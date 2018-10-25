@@ -1,3 +1,7 @@
+v0.5.2
+------
+- fix ssh and rsync binaries not getting updated when app is upgraded
+
 v0.5.1
 ------
 - show toast notification with path of exported config
