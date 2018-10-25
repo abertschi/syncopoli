@@ -3,6 +3,8 @@ Syncopoli - Rsync for Android
 
 [<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="60">](https://f-droid.org/app/org.amoradi.syncopoli)
 
+*NOTE*: Starting v0.5, you _must_ press "Verify Connection" in settings and verify that your host's fingerprint matches before you can sync.
+
 Permissions
 -----------
 * `READ_EXTERNAL_STORAGE`: for local to remote syncs.
