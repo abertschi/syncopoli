@@ -199,7 +199,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 
         Intent i = new Intent(this, BackupBackgroundService.class);
         i.putExtra("items", backups);
-        i.putExtra("items", true);
+        i.putExtra("force", true);
         startService(i);
     }
 
