@@ -62,7 +62,7 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
                     @Override
                     public void onClick(DialogInterface dialog, int item) {
                         if (item == 0) {
-                            mBackupClickHandler.onBackupEdit(getAdapterPosition());
+                            mBackupClickHandler.onBackupCopy(getAdapterPosition());
                         } else if (item == 1) {
                             mBackupClickHandler.onBackupEdit(getAdapterPosition());
                         } else if (item == 2) {

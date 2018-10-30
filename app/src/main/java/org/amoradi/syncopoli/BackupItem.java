@@ -9,6 +9,7 @@ import android.util.Log;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 class BackupItem implements Parcelable {
@@ -26,6 +27,28 @@ class BackupItem implements Parcelable {
     public Direction direction;
 
     public String rsync_options;
+
+    public BackupItem() {
+    }
+
+    public BackupItem(BackupItem other) {
+        this.name = other.name;
+
+        if (other.sources.length > 0) {
+            this.sources = new String[other.sources.length];
+            System.arraycopy(other.sources, 0, this.sources, 0, other.sources.length);
+        }
+            
+        this.destination = other.destination;
+        this.lastUpdate = other.lastUpdate;
+        this.direction = other.direction;
+        this.rsync_options = other.rsync_options;
+    }
+
+    @Override
+    public String toString() {
+        return "BackupItem { \"" + name + "\"}";
+    }
 
     public String getLogFileName() {
         return Uri.encode("log_" + this.name);

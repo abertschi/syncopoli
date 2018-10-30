@@ -49,14 +49,14 @@ public class BackupHandler implements IBackupHandler {
     }
 
     public int addBackup(BackupItem item) {
+        Log.d(TAG, "Adding backup: " + item);
+        
         if (item.sources[0].equals("") || item.name.equals("")) {
             return -1;
         }
 
-        for (BackupItem x : mBackupItems) {
-            if (x.name.equals(item.name)) {
-                return ERROR_BACKUP_EXISTS;
-            }
+        if (findBackup(item.name) != null) {
+            return ERROR_BACKUP_EXISTS;
         }
 
         BackupSyncOpenHelper dbHelper = new BackupSyncOpenHelper(mContext);
@@ -81,20 +81,21 @@ public class BackupHandler implements IBackupHandler {
         dbHelper.close();
 
         updateBackupList();
+        Log.d(TAG, "Adding backup succeeded");
         return 0;
     }
 
     public int copyBackup(BackupItem item) {
+        BackupItem item_copy = new BackupItem(item);
+
         int n = 1;
         String name;
         do {
             name = item.name + " - copy " + Integer.toString(n++);
         } while (findBackup(name) != null);
 
-        item.name = name;
-        addBackup(item);
-
-        return 0;
+        item_copy.name = name;
+        return addBackup(item_copy);
     }
 
     public int removeBackup(BackupItem item) {
