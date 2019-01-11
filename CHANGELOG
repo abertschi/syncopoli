@@ -1,3 +1,8 @@
+v0.5.3
+------
+- fix crash when running all tasks from UI
+- fix backup copy operation
+
 v0.5.2
 ------
 - fix ssh and rsync binaries not getting updated when app is upgraded
