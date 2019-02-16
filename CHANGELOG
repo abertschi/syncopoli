@@ -1,3 +1,10 @@
+v0.6
+----
+- migrate to androidx libraries
+- target api 28 (up from 25)
+- add x86_64 arch for native rsync and ssh builds
+- rename "Verify Connection" to "Trust host fingerprint"
+
 v0.5.3
 ------
 - fix crash when running all tasks from UI

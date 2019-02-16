@@ -16,59 +16,59 @@
         android:prompt="@string/addbackupitem_direction_prompt"
         style="@style/Widget.AppCompat.Spinner.Underlined"/>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/addbackupitem_name_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.design.widget.TextInputEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/addbackupitem_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/addbackupitem_name"
             android:inputType="text"/>
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/addbackupitem_source_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.design.widget.TextInputEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/addbackupitem_source"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/addbackupitem_origin"
             android:inputType="textMultiLine"/>
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/addbackupitem_destination_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.design.widget.TextInputEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/addbackupitem_destination"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/addbackupitem_destination"
             android:inputType="text"/>
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/addbackupitem_rsync_options_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.design.widget.TextInputEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/addbackupitem_rsync_options"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/addbackupitem_rsync_options"
             android:inputType="text"/>
 
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 </LinearLayout>
