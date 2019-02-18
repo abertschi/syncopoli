@@ -10,10 +10,6 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <uses-sdk
-        android:minSdkVersion="16"
-        android:targetSdkVersion="25" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -65,7 +61,9 @@
 
 		<service
 			android:name=".BackupBackgroundService"
-			android:exported="false" />
+			android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            />
 
     </application>
 </manifest>

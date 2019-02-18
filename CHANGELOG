@@ -4,6 +4,7 @@ v0.6
 - target api 28 (up from 25)
 - add x86_64 arch for native rsync and ssh builds
 - rename "Verify Connection" to "Trust host fingerprint"
+- migrate to JobIntentService for background execution to accommodate api 28+ restrictions
 
 v0.5.3
 ------

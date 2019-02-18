@@ -8,19 +8,25 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+
+import androidx.core.app.JobIntentService;
 import androidx.core.app.NotificationCompat;
 import android.util.Log;
 
-public class BackupBackgroundService extends IntentService {
+public class BackupBackgroundService extends JobIntentService {
     public final static String TAG = "Syncopoli";
+    public static final int JOB_ID = 1;
 
     public BackupBackgroundService() {
-        super("BackupBackgroundService");
-        setIntentRedelivery(true);
+        super();
+    }
+
+    static void enqueueWork(Context ctx, Intent i) {
+        JobIntentService.enqueueWork(ctx, BackupBackgroundService.class, JOB_ID, i);
     }
 
 	@Override
-	protected void onHandleIntent(Intent work) {
+	protected void onHandleWork(Intent work) {
 		Bundle bundle = work.getExtras();
 		Boolean force = bundle.getBoolean("force");
 
