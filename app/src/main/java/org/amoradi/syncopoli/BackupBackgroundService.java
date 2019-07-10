@@ -39,10 +39,16 @@ public class BackupBackgroundService extends IntentService {
 	}
 
     @Override
-	public void onCreate() {
-		Log.e(TAG, "onCreate!!!!!!!!");
-    	super.onCreate();
+    protected void onHandleIntent(Intent work) {
+        acquireForegroundResources();
+        try {
+            executeWork(work);
+        } finally {
+            releaseForegroundResources();
+        }
+    }
 
+    private void acquireForegroundResources() {
 		PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
 		wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Syncopoli: Sync wakelock");
 		wakeLock.acquire(20 * 60 * 1000); // timeout in millis
@@ -54,18 +60,14 @@ public class BackupBackgroundService extends IntentService {
 				.build();
 
 		startForeground(App.SYNC_NOTIF_ID, notif);
-	}
-
-    @Override
-	public void onDestroy() {
-    	Log.e(TAG, "onDestroy!!!!!!!!!");
-		wakeLock.release();
-		stopForeground(true);
-		super.onDestroy();
     }
 
-	@Override
-	protected void onHandleIntent(Intent work) {
+    private void releaseForegroundResources() {
+		wakeLock.release();
+		stopForeground(true);
+    }
+
+	private void executeWork(Intent work) {
 		Bundle bundle = work.getExtras();
 		Boolean force = bundle.getBoolean("force");
 
