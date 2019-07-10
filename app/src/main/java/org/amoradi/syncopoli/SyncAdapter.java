@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.SyncResult;
 import android.os.Bundle;
 
+import androidx.core.content.ContextCompat;
+
 import java.util.List;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
@@ -29,6 +31,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         Intent i = new Intent(getContext(), BackupBackgroundService.class);
         i.putExtra("items", backups);
-        BackupBackgroundService.enqueueWork(getContext(), i);
+        ContextCompat.startForegroundService(getContext(), i);
     }
 }

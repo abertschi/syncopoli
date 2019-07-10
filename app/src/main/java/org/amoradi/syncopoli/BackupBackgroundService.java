@@ -1,7 +1,7 @@
 package org.amoradi.syncopoli;
 
-import android.app.IntentService;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
@@ -9,24 +9,63 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 
-import androidx.core.app.JobIntentService;
+import android.app.IntentService;
 import androidx.core.app.NotificationCompat;
+
+import android.os.PowerManager;
 import android.util.Log;
 
-public class BackupBackgroundService extends JobIntentService {
+public class BackupBackgroundService extends IntentService {
     public final static String TAG = "Syncopoli";
-    public static final int JOB_ID = 1;
+    private PowerManager.WakeLock wakeLock;
 
     public BackupBackgroundService() {
-        super();
+        super("BackupBackgroundService");
+        setIntentRedelivery(true);
     }
 
-    static void enqueueWork(Context ctx, Intent i) {
-        JobIntentService.enqueueWork(ctx, BackupBackgroundService.class, JOB_ID, i);
+    private NotificationCompat.Builder getNotification(String id) {
+		int notif_icon = R.drawable.ic_action_refresh_bitmap;
+
+		if (Build.VERSION.SDK_INT >= 21) {
+			// >= lollipop, notification supports vector icons
+			notif_icon = R.drawable.ic_action_refresh;
+		}
+
+		return new NotificationCompat.Builder(getApplicationContext(), id)
+				.setWhen(System.currentTimeMillis())
+				.setAutoCancel(true)
+				.setSmallIcon(notif_icon);
+	}
+
+    @Override
+	public void onCreate() {
+		Log.e(TAG, "onCreate!!!!!!!!");
+    	super.onCreate();
+
+		PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+		wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Syncopoli: Sync wakelock");
+		wakeLock.acquire(20 * 60 * 1000); // timeout in millis
+
+		Notification notif = getNotification(App.SYNC_CHANNEL_ID)
+				.setTicker("Syncopoli")
+				.setContentTitle("Syncopoli")
+				.setContentText("Sync in progress...")
+				.build();
+
+		startForeground(App.SYNC_NOTIF_ID, notif);
+	}
+
+    @Override
+	public void onDestroy() {
+    	Log.e(TAG, "onDestroy!!!!!!!!!");
+		wakeLock.release();
+		stopForeground(true);
+		super.onDestroy();
     }
 
 	@Override
-	protected void onHandleWork(Intent work) {
+	protected void onHandleIntent(Intent work) {
 		Bundle bundle = work.getExtras();
 		Boolean force = bundle.getBoolean("force");
 
@@ -58,32 +97,23 @@ public class BackupBackgroundService extends JobIntentService {
     private void runTask(BackupHandler h, BackupItem b) {
 		int ret = h.runBackup(b);
 
-		int notif_icon = R.drawable.ic_action_refresh;
-
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-			// < lollipop, notification doesn't support vector icons
-			notif_icon = R.drawable.ic_action_refresh_bitmap;
-		}
-
+		// handle errors with new notification if necessary
 		if (ret != 0 && ret != BackupHandler.ERROR_DONOTRUN) {
-			Notification notif = new NotificationCompat.Builder(getApplicationContext())
-				.setContentTitle("Syncopoli")
-				.setContentText("Syncing " + b.name + " failed.")
-				.setTicker("Notification!")
-				.setWhen(System.currentTimeMillis())
-				.setSound(null)
-				.setVibrate(null)
-				.setAutoCancel(true)
-				.setSmallIcon(notif_icon)
-				.build();
+			int notif_icon = R.drawable.ic_action_refresh_bitmap;
 
-			NotificationManager notifyMan = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+			if (Build.VERSION.SDK_INT >= 21) {
+				// >= lollipop, notification supports vector icons
+				notif_icon = R.drawable.ic_action_refresh;
+			}
 
-			// int m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
-			notifyMan.notify(b.name, 1, notif);
-		} else {
-			NotificationManager notifyMan = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-			notifyMan.cancel(b.name, 1);
+			Notification error_notif = getNotification(App.ERROR_CHANNEL_ID)
+					.setTicker("Syncopoli")
+					.setContentTitle("Sync failed")
+					.setContentText(b.name)
+					.build();
+
+			NotificationManager notifyMan = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			notifyMan.notify(b.name, App.ERROR_NOTIF_ID, error_notif);
 		}
     }
 }

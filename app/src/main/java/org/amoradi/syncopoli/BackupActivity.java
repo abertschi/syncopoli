@@ -1,5 +1,6 @@
 package org.amoradi.syncopoli;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Fragment;
@@ -17,6 +18,7 @@ import androidx.annotation.LayoutRes;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import android.util.Log;
 import android.view.Menu;
@@ -62,7 +64,8 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         new Perm(android.Manifest.permission.WRITE_SYNC_SETTINGS, 4),
         new Perm(android.Manifest.permission.INTERNET, 5),
         new Perm(android.Manifest.permission.ACCESS_WIFI_STATE, 6),
-        new Perm(android.Manifest.permission.ACCESS_COARSE_LOCATION, 7)
+        new Perm(android.Manifest.permission.ACCESS_COARSE_LOCATION, 7),
+        new Perm(android.Manifest.permission.WAKE_LOCK, 8)
     };
 
     BackupHandler mBackupHandler;
@@ -86,7 +89,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
             if (copyExecutables() != 0) {
                 Toast.makeText(getApplicationContext(), "Unable to copy ssh and/or rsync executables. Please submit a bug report.", Toast.LENGTH_LONG).show();
             }
-            
+
             if (ensureSSHDir() != 0) {
                 Toast.makeText(getApplicationContext(), "Unable to create .ssh directory. Please submit a bug report.", Toast.LENGTH_LONG).show();
             }
@@ -200,7 +203,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         Intent i = new Intent(this, BackupBackgroundService.class);
         i.putExtra("items", backups);
         i.putExtra("force", true);
-        BackupBackgroundService.enqueueWork(getApplicationContext(), i);
+        ContextCompat.startForegroundService(getApplicationContext(), i);
     }
 
     @Override
@@ -552,7 +555,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         Intent i = new Intent(this, BackupBackgroundService.class);
         i.putExtra("item", b);
         i.putExtra("force", true);
-        BackupBackgroundService.enqueueWork(getApplicationContext(), i);
+        ContextCompat.startForegroundService(getApplicationContext(), i);
         return 0;
     }
 

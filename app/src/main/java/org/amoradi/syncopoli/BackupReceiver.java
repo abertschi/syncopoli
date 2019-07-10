@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.core.content.ContextCompat;
+
 public class BackupReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context ctx, Intent intent) {
@@ -36,7 +38,7 @@ public class BackupReceiver extends BroadcastReceiver {
 
             Intent i = new Intent(ctx, BackupBackgroundService.class);
             i.putExtra("item", b);
-            BackupBackgroundService.enqueueWork(ctx, i);
+            ContextCompat.startForegroundService(ctx, i);
         }
     }
 }
