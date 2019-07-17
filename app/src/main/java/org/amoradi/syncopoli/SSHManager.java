@@ -182,4 +182,41 @@ public class SSHManager {
         Log.e(TAG, "Unknown error occurred when trying to communicate with ssh process");
         return false;
     }
+
+    public void removeAcceptedHostKeyFingerprint(String hostname) throws IOException {
+        if (hostname == null || hostname.equals("")) {
+            return;
+        }
+
+        File acceptedFingerprintsFile = new File(mContext.getFilesDir().getAbsolutePath() + "/.ssh/",
+                                                 "authorized_keys");
+        StringBuilder lines = new StringBuilder();
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(acceptedFingerprintsFile));
+
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith(hostname)) {
+                    continue;
+                }
+
+                lines.append(line + "\n");
+            }
+        } catch (IOException e) {
+            Log.e(TAG, e.toString());
+            throw e;
+        }
+
+        acceptedFingerprintsFile.seek(0);
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(acceptedFingerprintsFile));
+            for (String line : lines) {
+                // write to authorized keys
+            }
+        } catch (IOException e) {
+            Log.e(TAG, e.toString());
+            throw e;
+        }
+    }
 }
