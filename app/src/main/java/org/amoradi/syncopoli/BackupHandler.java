@@ -249,7 +249,7 @@ public class BackupHandler implements IBackupHandler {
             String rsyncPath = new File(mContext.getFilesDir(), "rsync").getAbsolutePath();
             Log.d(TAG, "rsyncPath: " + rsyncPath);
             String sshPath = new File(mContext.getFilesDir(), "ssh").getAbsolutePath();
-            Log.d(TAG, "sshPath: " + rsyncPath);
+            Log.d(TAG, "sshPath: " + sshPath);
 
             FileOutputStream logFile = mContext.openFileOutput(b.getLogFileName(), Context.MODE_PRIVATE);
 
@@ -282,7 +282,8 @@ public class BackupHandler implements IBackupHandler {
             String rsync_options = prefs.getString(SettingsFragment.KEY_RSYNC_OPTIONS, "");
             String rsync_password = prefs.getString(SettingsFragment.KEY_RSYNC_PASSWORD, "");
             String ssh_password = prefs.getString(SettingsFragment.KEY_SSH_PASSWORD, "");
-            Boolean use_ssh_password = false;
+            boolean use_ssh_password = false;
+            boolean as_root = prefs.getBoolean(SettingsFragment.KEY_AS_ROOT, false);
 
             String server_address = prefs.getString(SettingsFragment.KEY_SERVER_ADDRESS, "");
 
@@ -335,12 +336,17 @@ public class BackupHandler implements IBackupHandler {
             }
 
             if (protocol.equals("SSH")) {
-                if (use_ssh_password) {
-                    args.add("-e");
-                    args.add(sshPath + " -p " + port);
+                args.add("-e");
+                String ssh_cmd = sshPath + " -p " + port;
+
+                if (!use_ssh_password) {
+                    ssh_cmd += " -i " + private_key;
+                }
+
+                if (as_root) {
+                    args.add("'" + ssh_cmd + "'");
                 } else {
-                    args.add("-e");
-                    args.add(sshPath + " -p " + port + " -i " + private_key);
+                    args.add(ssh_cmd);
                 }
 
                 if (b.direction == BackupItem.Direction.OUTGOING) {
@@ -372,19 +378,30 @@ public class BackupHandler implements IBackupHandler {
             /*
              * AS ROOT
              */
-            boolean as_root = prefs.getBoolean(SettingsFragment.KEY_AS_ROOT, false);
             ArrayList<String> final_cmd = new ArrayList<String>();
 
             if (as_root) {
                 StringBuilder sb = new StringBuilder();
-                for (String 
+                for (String s : args) {
+                    sb.append(s);
+                    sb.append(" ");
+                }
+
+                final_cmd.add("su");
+                final_cmd.add("--preserve-environment");
+                final_cmd.add("--command");
+                final_cmd.add(sb.toString());
+
+                Log.d(TAG, "with su: " + final_cmd.toString());
+            } else {
+                final_cmd = args;
             }
 
             /*
              * BUILD PROCESS
              */
 
-            ProcessBuilder pb = new ProcessBuilder(args);
+            ProcessBuilder pb = new ProcessBuilder(final_cmd);
             pb.directory(mContext.getFilesDir());
             pb.redirectErrorStream(true);
 
