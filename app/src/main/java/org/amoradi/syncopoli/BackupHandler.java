@@ -370,6 +370,17 @@ public class BackupHandler implements IBackupHandler {
             Log.d(TAG, "rsync exec: " + args.toString());
 
             /*
+             * AS ROOT
+             */
+            boolean as_root = prefs.getBoolean(SettingsFragment.KEY_AS_ROOT, false);
+            ArrayList<String> final_cmd = new ArrayList<String>();
+
+            if (as_root) {
+                StringBuilder sb = new StringBuilder();
+                for (String 
+            }
+
+            /*
              * BUILD PROCESS
              */
 
