@@ -110,7 +110,7 @@
             android:title="@string/pref_title_wifi_name" />
 
         <CheckBoxPreference
-            android:key="pref_as_root"
+            android:key="pref_key_as_root"
             android:title="@string/pref_title_as_root"
             android:summaryOff="@string/pref_sum_as_root"
             android:summaryOn="@string/pref_sum_as_root" />
