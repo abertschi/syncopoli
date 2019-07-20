@@ -183,40 +183,26 @@ public class SSHManager {
         return false;
     }
 
-    public void removeAcceptedHostKeyFingerprint(String hostname) throws IOException {
-        if (hostname == null || hostname.equals("")) {
-            return;
-        }
-
+    public boolean clearAcceptedHostKeyFingerprints() {
+        String filename = "known_hosts";
         File acceptedFingerprintsFile = new File(mContext.getFilesDir().getAbsolutePath() + "/.ssh/",
-                                                 "authorized_keys");
-        StringBuilder lines = new StringBuilder();
+                                                 filename);
 
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(acceptedFingerprintsFile));
-
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith(hostname)) {
-                    continue;
-                }
-
-                lines.append(line + "\n");
-            }
-        } catch (IOException e) {
-            Log.e(TAG, e.toString());
-            throw e;
+        if (!acceptedFingerprintsFile.delete()) {
+            Log.e(TAG, "Failed to delete " + acceptedFingerprintsFile.getAbsolutePath());
+            return false;
         }
 
-        acceptedFingerprintsFile.seek(0);
-
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(acceptedFingerprintsFile));
-            for (String line : lines) {
-                // write to authorized keys
+            if (!acceptedFingerprintsFile.createNewFile()) {
+                Log.e(TAG, "Failed to create new " + filename + " file: file already exists after being deleted: " + acceptedFingerprintsFile.getAbsolutePath());
+                return false;
             }
         } catch (IOException e) {
-            Log.e(TAG, e.toString());
-            throw e;
+            Log.e(TAG, "Failed to create new " + filename + " file: " + e.toString());
+            return false;
         }
+
+        return true;
     }
 }
