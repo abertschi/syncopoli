@@ -182,4 +182,27 @@ public class SSHManager {
         Log.e(TAG, "Unknown error occurred when trying to communicate with ssh process");
         return false;
     }
+
+    public boolean clearAcceptedHostKeyFingerprints() {
+        String filename = "known_hosts";
+        File acceptedFingerprintsFile = new File(mContext.getFilesDir().getAbsolutePath() + "/.ssh/",
+                                                 filename);
+
+        if (!acceptedFingerprintsFile.delete()) {
+            Log.e(TAG, "Failed to delete " + acceptedFingerprintsFile.getAbsolutePath());
+            return false;
+        }
+
+        try {
+            if (!acceptedFingerprintsFile.createNewFile()) {
+                Log.e(TAG, "Failed to create new " + filename + " file: file already exists after being deleted: " + acceptedFingerprintsFile.getAbsolutePath());
+                return false;
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to create new " + filename + " file: " + e.toString());
+            return false;
+        }
+
+        return true;
+    }
 }

@@ -42,6 +42,10 @@
             android:title="@string/pref_title_verify_host"
             android:key="pref_key_verify_host" />
 
+        <Preference
+            android:title="@string/pref_title_clear_hosts"
+            android:key="pref_key_clear_hosts" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

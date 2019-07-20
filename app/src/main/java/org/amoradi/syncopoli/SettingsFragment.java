@@ -29,6 +29,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public final static String KEY_WIFI_ONLY = "pref_key_wifi_only"; // boolean
     public final static String KEY_WIFI_NAME = "pref_key_wifi_name"; // String
     public final static String KEY_VERIFY_HOST = "pref_key_verify_host"; // String
+    public final static String KEY_CLEAR_HOSTS = "pref_key_clear_hosts"; // String
     public final static String KEY_AS_ROOT = "pref_key_as_root"; // boolean
     public final static String KEY_VERSION_CODE = "pref_key_version_code";
 
@@ -122,6 +123,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 return true;
             }
         });
+
+        Preference clearButton = findPreference(KEY_CLEAR_HOSTS);
+        clearButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new ClearHostsTask(getActivity().getWindow().getContext()).execute();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -169,6 +179,30 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         }
 	}
+
+	private class ClearHostsTask extends AsyncTask<Void, String, Boolean> {
+        private Context mContext;
+        private SSHManager sshman;
+
+        ClearHostsTask(Context ctx) {
+            mContext = ctx;
+            sshman = new SSHManager(mContext);
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            return sshman.clearAcceptedHostKeyFingerprints();
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean result) {
+            if (result) {
+                Toast.makeText(mContext, "Cleared all verified hosts", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(mContext, "Failed to clear hosts", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     private class GetHostFingerprintTask extends AsyncTask<Void, String, String> {
         private Context mContext;
