@@ -1,0 +1,60 @@
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation">
+
+    <string name="app_name">Syncopoli</string>
+    <string name="action_settings">Nastavení</string>
+
+    <string name="backup_title">Záloha</string>
+    <string name="settings_title">Nastavení</string>
+    <string name="export_title">Export</string>
+    <string name="import_title">Import</string>
+    <string name="action_run_backup">Spustit zálohu</string>
+
+    <string name="addbackupitem_name">Jméno profilu</string>
+    <string name="addbackupitem_origin">Zdroj</string>
+    <string name="addbackupitem_destination">Cíl</string>
+    <string name="addbackupitem_rsync_options">Další rsync možnosti</string>
+    <string name="addbackupitem_frequency">Frekvence (v hodinách)</string>
+    <string name="addbackupitem_direction_prompt">Směr zálohy</string>
+    <string-array name="addbackupitem_direction_entries">
+        <item>Vzdálené -> lokální</item>
+        <item>Lokální -> vzdálené</item>
+    </string-array>
+
+    <!-- Action bar icons -->
+    <string name="action_refresh">Obnovit</string>
+    <string name="action_done">Hotovo</string>
+    <string name="action_run">Spustit všechny zálohy</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- General settings -->
+    <string name="pref_header_general">Obecné</string>
+    <string name="pref_title_server_address">Adresa serveru</string>
+    <string name="pref_title_private_key">Soubor se soukromým klíčem</string>
+    <string name="pref_title_username">Uživatel</string>
+    <string name="pref_title_options">Přídavné Možnosti</string>
+    <string name="pref_title_protocol">Protokol</string>
+    <string name="pref_default_protocol">Rsync</string>
+    <string name="pref_title_port">Port</string>
+    <string name="pref_title_frequency">Frekvence (hodiny)</string>
+    <string name="pref_title_rsync_password">Rsync Heslo</string>
+    <string name="pref_title_ssh_password">SSH Heslo</string>
+    <string name="pref_title_wifi_only">Pouze WiFi</string>
+    <string name="pref_title_wifi_name">SSID k synchronizaci (rozdělené ;)</string>
+    <string name="pref_title_as_root">Spustit jako root</string>
+    <string name="pref_title_verify_host">Důvěřovat otisku hosta</string>
+    <string name="pref_title_clear_hosts">Vymazat důvěryhodné počítače</string>
+
+    <string-array name="pref_entries_protocol">
+        <item>SSH</item>
+        <item>Rsync</item>
+    </string-array>
+
+    <string name="pref_category_general">Obecné</string>
+    <string name="pref_category_sync_backup">Synchronizace &amp; Záloha</string>
+
+    <string name="pref_sum_wifi_only">Synchronizace potřebuje WiFi připojení pro pokračování</string>
+    <string name="pref_sum_no_wifi_only">Synchronizace bude pokračovat na jakémkoli připojení (včetně mobilních dat)</string>
+</resources>
