@@ -54,7 +54,7 @@
 
         <EditTextPreference
             android:capitalize="none"
-            android:defaultValue="-vHrlt --no-perms"
+            android:defaultValue="-vrlt --no-perms"
             android:inputType="text"
             android:key="pref_key_options"
             android:maxLines="1"
