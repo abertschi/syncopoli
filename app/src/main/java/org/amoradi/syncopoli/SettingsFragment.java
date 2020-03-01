@@ -62,9 +62,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 		 * the port to match the default for the protocol selected. Else, if the user has
 		 * changed the port to a custom one, then leave it alone since User Knows Best (TM)
 		 */
-		
+
+		SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 		if (key.equals(KEY_PROTOCOL)) {
-			SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 			int port = Integer.parseInt(prefs.getString(KEY_PORT, "22"));
 
 			int newport = -1;
@@ -76,15 +76,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 			}
 
 			if (newport > 0) {
-				getPreferenceScreen()
-					.getSharedPreferences()
-					.edit()
-					.putString(KEY_PORT, Integer.toString(newport))
-					.apply();
+                prefs.edit().putString(KEY_PORT, Integer.toString(newport)).apply();
 			}
 		}
 
         if (key.equals(KEY_FREQUENCY)) {
+            if (prefs.getString(KEY_FREQUENCY, "8").equals("")) {
+                prefs.edit().putString(KEY_FREQUENCY, Integer.toString(0)).apply();
+            }
+
             ((BackupActivity)getActivity()).setupSyncAccount();
         }
 
@@ -92,7 +92,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 		 * hide passwords from preference screen
 		 */
 		if (key.equals(KEY_SSH_PASSWORD) || key.equals(KEY_RSYNC_PASSWORD)) {
-			SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
             Preference p = findPreference(key);
 			if (prefs.getString(key, "").length() > 0) {
 				p.setSummary("******");

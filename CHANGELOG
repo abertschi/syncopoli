@@ -5,6 +5,7 @@ v0.6
 - add x86_64 arch for native rsync and ssh builds
 - rename "Verify Connection" to "Trust host fingerprint"
 - migrate to JobIntentService for background execution to accommodate api 28+ restrictions
+- fix crash when setting frequency to empty string
 
 v0.5.3
 ------
