@@ -200,10 +200,11 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         BackupItem[] backups = new BackupItem[bs.size()];
         bs.toArray(backups);
 
+
         Intent i = new Intent(this, BackupBackgroundService.class);
         i.putExtra("items", backups);
         i.putExtra("force", true);
-        ContextCompat.startForegroundService(getApplicationContext(), i);
+        BackupBackgroundService.enqueueWork(this, i);
     }
 
     @Override

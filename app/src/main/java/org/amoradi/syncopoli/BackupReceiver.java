@@ -38,7 +38,7 @@ public class BackupReceiver extends BroadcastReceiver {
 
             Intent i = new Intent(ctx, BackupBackgroundService.class);
             i.putExtra("item", b);
-            ContextCompat.startForegroundService(ctx, i);
+            BackupBackgroundService.enqueueWork(ctx, i);
         }
     }
 }

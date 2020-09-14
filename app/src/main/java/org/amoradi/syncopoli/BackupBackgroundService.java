@@ -1,28 +1,23 @@
 package org.amoradi.syncopoli;
 
+import android.app.IntentService;
 import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
-
-import android.app.IntentService;
-import androidx.core.app.NotificationCompat;
-
 import android.os.PowerManager;
 import android.util.Log;
 
-public class BackupBackgroundService extends IntentService {
-    public final static String TAG = "Syncopoli";
-    private PowerManager.WakeLock wakeLock;
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.JobIntentService;
 
-    public BackupBackgroundService() {
-        super("BackupBackgroundService");
-        setIntentRedelivery(true);
-    }
+public class BackupBackgroundService extends JobIntentService {
+    public final static String TAG = "Syncopoli";
+    private static final int JOB_ID = 1234;
 
     private NotificationCompat.Builder getNotification(String id) {
 		int notif_icon = R.drawable.ic_action_refresh_bitmap;
@@ -38,21 +33,12 @@ public class BackupBackgroundService extends IntentService {
 				.setSmallIcon(notif_icon);
 	}
 
+	static void enqueueWork(Context ctx, Intent work) {
+    	enqueueWork(ctx, BackupBackgroundService.class, JOB_ID, work);
+	}
+
     @Override
-    protected void onHandleIntent(Intent work) {
-        acquireForegroundResources();
-        try {
-            executeWork(work);
-        } finally {
-            releaseForegroundResources();
-        }
-    }
-
-    private void acquireForegroundResources() {
-		PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-		wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Syncopoli: Sync wakelock");
-		wakeLock.acquire(20 * 60 * 1000); // timeout in millis
-
+    protected void onHandleWork(@NonNull Intent work) {
 		Notification notif = getNotification(App.SYNC_CHANNEL_ID)
 				.setTicker("Syncopoli")
 				.setContentTitle("Syncopoli")
@@ -60,11 +46,12 @@ public class BackupBackgroundService extends IntentService {
 				.build();
 
 		startForeground(App.SYNC_NOTIF_ID, notif);
-    }
 
-    private void releaseForegroundResources() {
-		wakeLock.release();
-		stopForeground(true);
+        try {
+            executeWork(work);
+        } finally {
+			stopForeground(true);
+        }
     }
 
 	private void executeWork(Intent work) {
