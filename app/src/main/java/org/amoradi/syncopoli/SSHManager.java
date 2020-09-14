@@ -125,7 +125,7 @@ public class SSHManager {
         /* this option is added in patched version of dropbear
          * -C make dropbear print remote host fingerprint and exit, which is what we want
          */
-        args.add("-A");
+        args.add("-Z");
         args.add(fingerprint);
         args.add(host);
 
