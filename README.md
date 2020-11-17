@@ -16,17 +16,21 @@ Permissions
 
 Global Options
 --------------
-* Server address - The IP address of your server
 * Protocol - Rsync or SSH
+* Server address - The IP address of your server
 * Port - Port where rsync or ssh daemon is listening
 * User - This should be your rsync user or ssh user (depending on protocol)
+* Trust host fingerprint - verify the fingerprint of the host you're connecting to
+* Clear trusted hosts - clear all fingerprints that were previously trusted
+
 * Additional Options - Any additional options you want to give rsync. This is applied to all sync profiles.
-* Private key - Should be your dropbear-compatible ssh key (see below)
+* Private Key File - Should be your dropbear-compatible ssh key (see below)
 * Rsync Password - password used to authenticate with the Rsync daemon
 * SSH Password - password used to authenticate using ssh protocol
 * Frequency - How often you want to run all the sync profiles (in hours)
 * Wifi only - whether to sync over wifi only
 * SSIDs to sync - sync only when connected to the specified SSIDs, e.g. mynetwork;yournetwork;somenetwork
+* Run as root - This allows syncing directories that are normally not accessible. Requires `su` binary (see below).
 
 Profile Options
 ---------------
@@ -39,6 +43,10 @@ Profile Options
 SSH Key
 -------
 Syncopoli requires a dropbear-compatible ssh key. You can use `dropbearconvert` to convert your openssh key to dropbear key.
+
+Root requirement
+----------------
+Syncopoli requires a compatible `su` binary to be present on the system which preserves environment variables. The only compatible `su` binary I've found so far is from MagiskSU which carries over environment variables with `--preserve-environment`. Unfortunately, LineageOS's `addonsu` doesn't respect environment variables and can't be used with Syncopoli. Busybox on android doesn't provide a `su` binary.
 
 External binaries
 -----------------
