@@ -6,9 +6,13 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.Buffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +26,9 @@ public class SSHManager {
 
     /* This needs the patched version of dropbear!
      * see gitlab.com/fengshaun/android-dropbear commit f49af1902d3d683c59a7445746fa3a35cd07ef33
-     * Format: Fingerprint: md5 ab:cd:ef:...
+     * Format: Fingerprint: sha1!! ab:cd:ef:...
      */
-    private Pattern mFingerprintPattern = Pattern.compile("^Fingerprint: [\\w\\d]+ ([\\w:]+)$");
+    private Pattern mFingerprintPattern = Pattern.compile("^Fingerprint: [\\w\\d!]+ ([\\w:]+)$");
     private Pattern mAcceptedPattern = Pattern.compile("^Accepted fingerprint$");
 
     private String host;
@@ -101,16 +105,14 @@ public class SSHManager {
                     } catch (InterruptedException e) {
                         Log.e(TAG, e.toString());
                     }
-
                     return fp;
                 }
             }
         } catch (IOException e) {
             Log.e(TAG, "Could not read/write from ssh process");
+            Log.e(TAG, e.getMessage());
             return null;
         }
-
-        Log.e(TAG, "Unknown error occurred when trying to communicate with ssh process");
         return null;
     }
 
@@ -128,6 +130,7 @@ public class SSHManager {
         args.add("-Z");
         args.add(fingerprint);
         args.add(host);
+        Log.i(TAG, args.toString());
 
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.directory(mContext.getFilesDir());
@@ -140,8 +143,8 @@ public class SSHManager {
         /*
          * RUN PROCESS
          */
-
         Process process;
+
         try {
             process = pb.start();
         } catch (IOException e) {
@@ -152,10 +155,18 @@ public class SSHManager {
         /*
          * GET STDOUT/STDERR
          */
-
         String temp;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
+        try {
+            writer.write("y".toCharArray(), 0, 1);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Could not write to stdin: " + e);
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         /* Read STDOUT & STDERR */
         try {
             while ((temp = reader.readLine()) != null) {
@@ -170,7 +181,6 @@ public class SSHManager {
                     } catch (InterruptedException e) {
                         Log.e(TAG, e.toString());
                     }
-
                     return true;
                 }
             }
@@ -178,7 +188,6 @@ public class SSHManager {
             Log.e(TAG, "Could not read/write from ssh process");
             return false;
         }
-
         Log.e(TAG, "Unknown error occurred when trying to communicate with ssh process");
         return false;
     }
@@ -186,7 +195,7 @@ public class SSHManager {
     public boolean clearAcceptedHostKeyFingerprints() {
         String filename = "known_hosts";
         File acceptedFingerprintsFile = new File(mContext.getFilesDir().getAbsolutePath() + "/.ssh/",
-                                                 filename);
+                filename);
 
         if (!acceptedFingerprintsFile.delete()) {
             Log.e(TAG, "Failed to delete " + acceptedFingerprintsFile.getAbsolutePath());
