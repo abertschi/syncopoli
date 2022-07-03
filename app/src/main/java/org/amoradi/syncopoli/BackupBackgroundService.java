@@ -14,12 +14,25 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.JobIntentService;
+import androidx.core.content.ContextCompat;
 
 public class BackupBackgroundService extends JobIntentService {
     public final static String TAG = "Syncopoli";
     private static final int JOB_ID = 1234;
 
-    private NotificationCompat.Builder getNotification(String id) {
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		Notification notif = getNotification(App.SYNC_CHANNEL_ID)
+				.setTicker("Syncopoli")
+				.setContentTitle("Syncopoli")
+				.setContentText("Sync in progress...")
+				.build();
+
+		startForeground(App.SYNC_NOTIF_ID, notif);
+	}
+
+	private NotificationCompat.Builder getNotification(String id) {
 		int notif_icon = R.drawable.ic_action_refresh_bitmap;
 
 		if (Build.VERSION.SDK_INT >= 21) {
@@ -39,15 +52,14 @@ public class BackupBackgroundService extends JobIntentService {
 
     @Override
     protected void onHandleWork(@NonNull Intent work) {
-		Notification notif = getNotification(App.SYNC_CHANNEL_ID)
-				.setTicker("Syncopoli")
-				.setContentTitle("Syncopoli")
-				.setContentText("Sync in progress...")
-				.build();
-
-		startForeground(App.SYNC_NOTIF_ID, notif);
-
         try {
+			Notification notif = getNotification(App.SYNC_CHANNEL_ID)
+					.setTicker("Syncopoli")
+					.setContentTitle("Syncopoli")
+					.setContentText("Sync in progress...")
+					.build();
+
+			startForeground(App.SYNC_NOTIF_ID, notif);
             executeWork(work);
         } finally {
 			stopForeground(true);
