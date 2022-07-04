@@ -30,12 +30,12 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BackupLogFragment extends Fragment {
+    private static final String TAG = "Syncpololi";
     private BackupItem mBackupItem;
     private Thread textReaderThread;
     private TextLineAdapter textLineAdapter;
     private Handler textLineHandler;
     private RecyclerView recycleView;
-    static final String TAG = "Syncpololi";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
