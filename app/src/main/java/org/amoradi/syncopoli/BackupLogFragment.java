@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,6 +34,8 @@ public class BackupLogFragment extends Fragment {
     private Thread textReaderThread;
     private TextLineAdapter textLineAdapter;
     private Handler textLineHandler;
+    private RecyclerView recycleView;
+    static final String TAG = "Syncpololi";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,25 +50,26 @@ public class BackupLogFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = null;
+        View view = null;
         if (mBackupItem != null) {
             textLineHandler = new Handler(Looper.getMainLooper()) {
                 @Override
                 public void handleMessage(Message msg) {
                     super.handleMessage(msg);
-                    textLineAdapter.addTextLines((ArrayList<TextLine>) msg.obj);
+                    Log.i(TAG, "Handle new message on Main Thread");
+                    textLineAdapter.addTextLines((List<TextLine>) msg.obj);
                 }
             };
+            view = inflater.inflate(R.layout.fragment_backuplog, container, false);
             textLineAdapter = new TextLineAdapter(container.getContext());
-            v = inflater.inflate(R.layout.fragment_backuplog, container, false);
-            RecyclerView recycleView = v.findViewById(R.id.recyclerView);
+            recycleView = view.findViewById(R.id.recyclerView);
             recycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
             recycleView.setAdapter(textLineAdapter);
         } else {
             textLineAdapter.addTextLine(new TextLine(0, "mBackupItem is null"));
         }
 
-        return v;
+        return view;
     }
 
     @Override
@@ -112,6 +115,7 @@ public class BackupLogFragment extends Fragment {
         menu.findItem(R.id.action_done).setVisible(false);
         menu.findItem(R.id.action_refresh).setVisible(true);
         menu.findItem(R.id.action_run).setVisible(false);
+        menu.findItem(R.id.action_scroll_down).setVisible(true);
     }
 
     @Override
@@ -120,7 +124,10 @@ public class BackupLogFragment extends Fragment {
         if (id == R.id.action_refresh) {
             stopWorker();
             startWorker();
-        } else {
+        } else if (id == R.id.action_scroll_down) {
+            recycleView.smoothScrollToPosition(textLineAdapter.getItemCount() - 1);
+        }
+        else {
             return super.onOptionsItemSelected(item);
         }
         return true;
@@ -229,12 +236,15 @@ public class BackupLogFragment extends Fragment {
         }
 
         public void run() {
+            Log.i(TAG, "Start text reader thread");
             stopped.set(false);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
             int lineNumber = 1;
+            final int ARRAY_CAP = READ_CHUNK + 1;
+
             try {
                 String textLine = bufferedReader.readLine();
-                ArrayList<TextLine> ls = new ArrayList<>(READ_CHUNK + 1);
+                ArrayList<TextLine> ls = new ArrayList<>(ARRAY_CAP);
                 int readChunk = 0;
 
                 while (null != textLine) {
@@ -242,7 +252,7 @@ public class BackupLogFragment extends Fragment {
                     if (readChunk >= READ_CHUNK) {
                         Message.obtain(lineHandler, 0, ls).sendToTarget();
                         readChunk = 0;
-                        ls = new ArrayList<>(READ_CHUNK + 1);
+                        ls = new ArrayList<>(ARRAY_CAP);
                     }
                     readChunk++;
                     if (stopped.get()) {
@@ -250,6 +260,9 @@ public class BackupLogFragment extends Fragment {
                     }
                     textLine = bufferedReader.readLine();
                     lineNumber++;
+                }
+                if (ls.size() > 0) {
+                    Message.obtain(lineHandler, 0, ls).sendToTarget();
                 }
             } catch (IOException e) {
                 ArrayList<TextLine> msg = new ArrayList<>();

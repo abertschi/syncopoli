@@ -10,15 +10,18 @@
             android:layout_height="wrap_content"
             app:layout_constraintHorizontal_weight="1"
             android:textSize="11sp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginStart="2dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/textLine" />
+            app:layout_constraintEnd_toStartOf="@id/textLine"  />
+
 
     <TextView
             android:id="@+id/textLine"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintHorizontal_weight="12"
+            app:layout_constraintHorizontal_weight="30"
             android:textSize="12sp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/lineNumber"

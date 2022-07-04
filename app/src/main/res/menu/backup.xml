@@ -2,13 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
     <item
         android:id="@+id/action_refresh"
         android:icon="@drawable/ic_action_refresh"
         android:title="@string/action_refresh"
-        app:showAsAction="ifRoom"
-        />
+        app:showAsAction="ifRoom" />
 
+	<item
+			android:id="@+id/action_scroll_down"
+			android:icon="@drawable/ic_action_down"
+			android:title="@string/action_scroll_down"
+			android:visible="false"
+			app:showAsAction="ifRoom"
+			/>
     <item
         android:id="@+id/action_done"
         android:icon="@drawable/ic_action_done"
@@ -16,7 +23,9 @@
         app:showAsAction="ifRoom"
         />
 
-    <item
+
+
+	<item
         android:id="@+id/action_run"
         android:icon="@drawable/ic_action_run"
         android:title="Run all backups"
