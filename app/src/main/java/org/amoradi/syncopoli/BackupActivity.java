@@ -443,10 +443,12 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 			SharedPreferences.Editor editor = prefs.edit();
 
             for (String k : SettingsFragment.KEYS) {
-                if (SettingsFragment.isSharedPreferenceBooleanKey(k)) {
-                    editor.putBoolean(k, globals.getBoolean(k));
-                } else {
-                    editor.putString(k, globals.getString(k));
+                if (globals.has(k)) {
+                    if (SettingsFragment.isSharedPreferenceBooleanKey(k)) {
+                        editor.putBoolean(k, globals.getBoolean(k));
+                    } else {
+                        editor.putString(k, globals.getString(k));
+                    }
                 }
             }
             editor.apply();
