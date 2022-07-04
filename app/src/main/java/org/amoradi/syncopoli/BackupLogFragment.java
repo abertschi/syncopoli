@@ -79,19 +79,21 @@ public class BackupLogFragment extends Fragment {
     }
 
     private void stopWorker() {
-        textReaderThread.interrupt();
-        try {
-            textReaderThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (textReaderThread != null && !textReaderThread.isInterrupted()) {
+            textReaderThread.interrupt();
+            try {
+                textReaderThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     private void startWorker() {
-        if (textLineAdapter == null) return;
-        if (textReaderThread != null && !textReaderThread.isInterrupted()) {
-            stopWorker();
+        if (textLineAdapter == null){
+            return;
         }
+        stopWorker();
         textLineAdapter.clear();
         try {
             FileInputStream in = getActivity().getApplicationContext().openFileInput(mBackupItem.getLogFileName());
