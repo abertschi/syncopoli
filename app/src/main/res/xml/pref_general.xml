@@ -105,6 +105,13 @@
             android:summaryOff="@string/pref_sum_no_wifi_only"
             android:summaryOn="@string/pref_sum_wifi_only" />
 
+        <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_charger_only"
+                android:title="@string/pref_title_charger"
+                android:summaryOff="@string/pref_sum_charger_and_battery"
+                android:summaryOn="@string/pref_sum_charger_only" />
+
         <EditTextPreference
             android:defaultValue=""
             android:inputType="text"

@@ -32,6 +32,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public final static String KEY_CLEAR_HOSTS = "pref_key_clear_hosts"; // String
     public final static String KEY_AS_ROOT = "pref_key_as_root"; // boolean
     public final static String KEY_VERSION_CODE = "pref_key_version_code";
+    public final static String KEY_CHARGER_ONLY = "pref_key_charger_only"; // boolean
+
+    public static boolean isSharedPreferenceBooleanKey(String k) {
+        return k.equals(SettingsFragment.KEY_WIFI_ONLY) || k.equals(SettingsFragment.KEY_AS_ROOT) || k.equals(SettingsFragment.KEY_CHARGER_ONLY);
+    }
 
 	private final static int DEFAULT_RSYNC_PORT = 873;
 	private final static int DEFAULT_SSH_PORT = 22;
@@ -48,12 +53,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         KEY_SSH_PASSWORD,
         KEY_WIFI_ONLY,
         KEY_WIFI_NAME,
-        KEY_AS_ROOT
+        KEY_AS_ROOT,
+        KEY_CHARGER_ONLY
     };
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(KEY_WIFI_ONLY) || key.equals(KEY_AS_ROOT)) {
+        if (isSharedPreferenceBooleanKey(key)) {
             return;
         }
 

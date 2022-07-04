@@ -253,7 +253,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		try {
 			for (String k : SettingsFragment.KEYS) {
-                if (k.equals(SettingsFragment.KEY_WIFI_ONLY) || k.equals(SettingsFragment.KEY_AS_ROOT)) {
+                if (SettingsFragment.isSharedPreferenceBooleanKey(k)) {
                     globals.put(k, prefs.getBoolean(k, false));
                 } else {
                     globals.put(k, prefs.getString(k, ""));
@@ -443,15 +443,13 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 			SharedPreferences.Editor editor = prefs.edit();
 
             for (String k : SettingsFragment.KEYS) {
-                if (k.equals(SettingsFragment.KEY_WIFI_ONLY) || k.equals(SettingsFragment.KEY_AS_ROOT)) {
+                if (SettingsFragment.isSharedPreferenceBooleanKey(k)) {
                     editor.putBoolean(k, globals.getBoolean(k));
                 } else {
                     editor.putString(k, globals.getString(k));
                 }
             }
-
             editor.apply();
-
 		} catch (JSONException e) {
 			Log.e(TAG, "ERROR importing globals: " + e.getMessage());
 			return -1;
