@@ -1,3 +1,14 @@
+v0.7 (PENDING)
+-----
+- Add androidx.constraintlayout
+- Fix gradle build for android studio 2021 (update to gradle-7.2)
+- Fix crashing behavior due to missing startForeground() in onCreate of service
+- Reduce lag when viewing large log files with recycleview
+- Add feature to scroll to bottom of log file
+- Add feature to only sync when connected to charger
+- Fix bug trying to cast string to boolean when persisting shared preferences
+- fix fingerprint issue with dropbear which prevented fingerprint check to proceed
+
 v0.6
 ----
 - migrate to androidx libraries
