@@ -1,25 +1,39 @@
 package org.amoradi.syncopoli;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BackupLogFragment extends Fragment {
     private BackupItem mBackupItem;
-    private int mFileLine;
+    private Thread textReaderThread;
+    private TextLineAdapter textLineAdapter;
+    private Handler textLineHandler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,15 +48,62 @@ public class BackupLogFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_backuplog, container, false);
+        View v = null;
         if (mBackupItem != null) {
-            mFileLine = 0;
-            ((TextView) v.findViewById(R.id.backuplog_textview)).setText(getLogString(mBackupItem.getLogFileName()));
+            textLineHandler = new Handler(Looper.getMainLooper()) {
+                @Override
+                public void handleMessage(Message msg) {
+                    super.handleMessage(msg);
+                    textLineAdapter.addTextLines((ArrayList<TextLine>) msg.obj);
+                }
+            };
+            textLineAdapter = new TextLineAdapter(container.getContext());
+            v = inflater.inflate(R.layout.fragment_backuplog, container, false);
+            RecyclerView recycleView = v.findViewById(R.id.recyclerView);
+            recycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            recycleView.setAdapter(textLineAdapter);
         } else {
-            ((TextView) v.findViewById(R.id.backuplog_textview)).setText("mBackupItem is null");
+            textLineAdapter.addTextLine(new TextLine(0, "mBackupItem is null"));
         }
 
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        startWorker();
+    }
+
+    private void stopWorker() {
+        textReaderThread.interrupt();
+        try {
+            textReaderThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void startWorker() {
+        if (textLineAdapter == null) return;
+        if (textReaderThread != null && !textReaderThread.isInterrupted()) {
+            stopWorker();
+        }
+        textLineAdapter.clear();
+        try {
+            FileInputStream in = getActivity().getApplicationContext().openFileInput(mBackupItem.getLogFileName());
+            textReaderThread = new TextReaderThread(in, textLineHandler);
+            textReaderThread.start();
+        } catch (FileNotFoundException e) {
+            textLineAdapter.addTextLine(new TextLine(0, e.getMessage()));
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopWorker();
     }
 
     @Override
@@ -56,40 +117,152 @@ public class BackupLogFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.action_refresh) {
-            ((TextView) getView().findViewById(R.id.backuplog_textview)).setText(getLogString(mBackupItem.getLogFileName()));
-            ((ScrollView) getView().findViewById(R.id.backuplog_scrollview)).fullScroll(View.FOCUS_DOWN);
+            stopWorker();
+            startWorker();
         } else {
             return super.onOptionsItemSelected(item);
         }
-
         return true;
     }
 
-    public String getLogString(String filename) {
-        try {
-            FileInputStream ins = getActivity().getApplicationContext().openFileInput(filename);
+    /**
+     * POJO for a single text line
+     **/
+    class TextLine {
+        private int lineNr;
+        private String content;
 
-            LineNumberReader reader = new LineNumberReader(new InputStreamReader(ins));
-            reader.setLineNumber(mFileLine);
+        public TextLine(int lineNr, String content) {
+            this.lineNr = lineNr;
+            this.content = content;
+        }
 
-            StringBuilder output = new StringBuilder();
-            String line = reader.readLine();
-            while (line != null) {
-                output.append(line + "\n");
-                mFileLine = reader.getLineNumber();
-                line = reader.readLine();
+        public int getLineNr() {
+            return lineNr;
+        }
+
+        public void setLineNr(int lineNr) {
+            this.lineNr = lineNr;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public void setContent(String content) {
+            this.content = content;
+        }
+
+    }
+
+    /**
+     * Adapter to render many text lines in recycle view
+     **/
+    private class TextLineAdapter extends RecyclerView.Adapter<ViewHolder> {
+        Context mContext;
+        List<TextLine> mItems;
+
+        public TextLineAdapter(Context context) {
+            mContext = context;
+            mItems = new ArrayList<>();
+        }
+
+        public void addTextLines(List<TextLine> textLine) {
+            mItems.addAll(textLine);
+            notifyItemInserted(mItems.size() - 1);
+        }
+
+        public void addTextLine(TextLine textLine) {
+            mItems.add(textLine);
+            notifyItemInserted(mItems.size() - 1);
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new ViewHolder(
+                    LayoutInflater.from(mContext).inflate(R.layout.log_item, parent, false)
+            );
+        }
+
+        public void clear() {
+            mItems.clear();
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            holder.lineNumberView.setText(Integer.toString(mItems.get(position).getLineNr()));
+            holder.textLineView.setText(mItems.get(position).getContent());
+        }
+
+        @Override
+        public int getItemCount() {
+            return mItems.size();
+        }
+    }
+
+    class ViewHolder extends RecyclerView.ViewHolder {
+        final TextView lineNumberView;
+        final TextView textLineView;
+
+        public ViewHolder(@NonNull View view) {
+            super(view);
+            lineNumberView = view.findViewById(R.id.lineNumber);
+            textLineView = view.findViewById(R.id.textLine);
+        }
+    }
+
+    /**
+     * Worker to read from an input stream and inform a handler on changes
+     */
+    private class TextReaderThread extends Thread {
+        private final int READ_CHUNK = 100; // How many lines to read before update
+        private AtomicBoolean stopped = new AtomicBoolean(false);
+        private InputStream in;
+        private Handler lineHandler;
+
+        public TextReaderThread(InputStream in, Handler lineHandler) {
+            this.in = in;
+            this.lineHandler = lineHandler;
+        }
+
+        public void run() {
+            stopped.set(false);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+            int lineNumber = 1;
+            try {
+                String textLine = bufferedReader.readLine();
+                ArrayList<TextLine> ls = new ArrayList<>(READ_CHUNK + 1);
+                int readChunk = 0;
+
+                while (null != textLine) {
+                    ls.add(new TextLine(lineNumber, textLine));
+                    if (readChunk >= READ_CHUNK) {
+                        Message.obtain(lineHandler, 0, ls).sendToTarget();
+                        readChunk = 0;
+                        ls = new ArrayList<>(READ_CHUNK + 1);
+                    }
+                    readChunk++;
+                    if (stopped.get()) {
+                        break;
+                    }
+                    textLine = bufferedReader.readLine();
+                    lineNumber++;
+                }
+            } catch (IOException e) {
+                ArrayList<TextLine> msg = new ArrayList<>();
+                msg.add(new TextLine(0, e.getMessage()));
+                Message.obtain(lineHandler, 0, msg).sendToTarget();
+                e.printStackTrace();
             }
-            reader.close();
-            ins.close();
+        }
 
-            return output.toString();
-        } catch (FileNotFoundException e) {
-            return "Log file not found.";
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "An error occurred while trying to read log file.";
+        @Override
+        public void interrupt() {
+            stopped.set(true);
+            super.interrupt();
         }
     }
 }
