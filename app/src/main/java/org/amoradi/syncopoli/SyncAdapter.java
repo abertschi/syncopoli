@@ -31,6 +31,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         Intent i = new Intent(getContext(), BackupBackgroundService.class);
         i.putExtra("items", backups);
-        ContextCompat.startForegroundService(getContext(), i);
+        BackupBackgroundService.enqueueWork(getContext(), i);
     }
 }
