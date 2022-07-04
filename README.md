@@ -29,6 +29,7 @@ Global Options
 * SSH Password - password used to authenticate using ssh protocol
 * Frequency - How often you want to run all the sync profiles (in hours)
 * Wifi only - whether to sync over wifi only
+* Charger only - whether to sync only if phone is charging
 * SSIDs to sync - sync only when connected to the specified SSIDs, e.g. mynetwork;yournetwork;somenetwork
 * Run as root - This allows syncing directories that are normally not accessible. Requires `su` binary (see below).
 
