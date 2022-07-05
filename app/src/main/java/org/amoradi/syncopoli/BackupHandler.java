@@ -2,6 +2,8 @@ package org.amoradi.syncopoli;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -375,6 +377,7 @@ public class BackupHandler implements IBackupHandler {
             }
 
             Log.d(TAG, "rsync exec: " + args.toString());
+            logFile.write(("rsync exec: " + args.toString() + "\n\n").getBytes());
 
             /*
              * AS ROOT
@@ -394,6 +397,7 @@ public class BackupHandler implements IBackupHandler {
                 final_cmd.add(sb.toString());
 
                 Log.d(TAG, "with su: " + final_cmd.toString());
+                logFile.write(("with su:: " + final_cmd.toString() + "\n\n").getBytes());
             } else {
                 final_cmd = args;
             }
@@ -457,6 +461,14 @@ public class BackupHandler implements IBackupHandler {
         }
     }
 
+    private boolean isCharging() {
+        IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = mContext.registerReceiver(null, filter);
+        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        return (status == BatteryManager.BATTERY_STATUS_CHARGING) ||
+                (status == BatteryManager.BATTERY_STATUS_FULL);
+    }
+
     public boolean canRunBackup() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         boolean wifi_only = prefs.getBoolean(SettingsFragment.KEY_WIFI_ONLY, false);
@@ -466,17 +478,15 @@ public class BackupHandler implements IBackupHandler {
             return true;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean chargerOnly = prefs.getBoolean(SettingsFragment.KEY_CHARGER_ONLY, false);
-            BatteryManager manager = (BatteryManager) mContext.getSystemService(Context.BATTERY_SERVICE);
-            if (chargerOnly && !manager.isCharging()) {
-                Log.d(TAG, SettingsFragment.KEY_CHARGER_ONLY +
-                        " is set to true and phone not connected to charger");
-                return false;
-            }
+        boolean chargerOnly = prefs.getBoolean(SettingsFragment.KEY_CHARGER_ONLY, false);
+        if (chargerOnly && !isCharging()) {
+            Log.d(TAG, SettingsFragment.KEY_CHARGER_ONLY +
+                    " is set to true and phone not connected to charger");
+            return false;
         }
 
-        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) mContext.getApplicationContext()
+                .getSystemService(Context.WIFI_SERVICE);
         if (!wifiManager.isWifiEnabled()) {
             Log.d(TAG, "Wifi not enabled");
             return false;

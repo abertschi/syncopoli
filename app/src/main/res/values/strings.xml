@@ -51,7 +51,7 @@
     <string name="pref_title_clear_hosts">Clear trusted hosts</string>
 
     <string name="pref_title_charger">Charging only</string>
-    <string name="pref_sum_charger_only">Sync will require phone connected to charger to proceed (requires Android Marshmallow or newer)</string>
+    <string name="pref_sum_charger_only">Sync will require phone connected to charger to proceed</string>
     <string name="pref_sum_charger_and_battery">Sync will proceed on battery or charger</string>
 
 

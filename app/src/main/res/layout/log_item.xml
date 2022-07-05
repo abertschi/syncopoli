@@ -18,10 +18,11 @@
 
 
     <TextView
+            android:textIsSelectable="true"
             android:id="@+id/textLine"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintHorizontal_weight="30"
+            app:layout_constraintHorizontal_weight="9"
             android:textSize="12sp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/lineNumber"

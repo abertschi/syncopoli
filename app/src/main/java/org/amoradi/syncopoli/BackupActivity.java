@@ -8,8 +8,10 @@ import android.app.FragmentTransaction;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -65,7 +67,8 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         new Perm(android.Manifest.permission.INTERNET, 5),
         new Perm(android.Manifest.permission.ACCESS_WIFI_STATE, 6),
         new Perm(android.Manifest.permission.ACCESS_COARSE_LOCATION, 7),
-        new Perm(android.Manifest.permission.WAKE_LOCK, 8)
+        new Perm(android.Manifest.permission.WAKE_LOCK, 8),
+        new Perm(Manifest.permission.GET_ACCOUNTS, 9)
     };
 
     BackupHandler mBackupHandler;
@@ -74,7 +77,6 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_backup);
-
         setup(true);
     }
 
