@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BackupLogFragment extends Fragment {
     private static final String TAG = "Syncpololi";
+
     private BackupItem mBackupItem;
     private Thread textReaderThread;
     private TextLineAdapter textLineAdapter;
@@ -127,7 +128,7 @@ public class BackupLogFragment extends Fragment {
             stopWorker();
             startWorker();
         } else if (id == R.id.action_scroll_down) {
-            recycleView.smoothScrollToPosition(textLineAdapter.getItemCount() - 1);
+            recycleView.scrollToPosition(textLineAdapter.getItemCount() - 1);
         }
         else {
             return super.onOptionsItemSelected(item);
