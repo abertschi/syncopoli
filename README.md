@@ -13,6 +13,7 @@ Permissions
 * `INTERNET`: rsync needs network access.
 * `ACCESS_WIFI_STATE`: get wifi SSID for `Wifi only` setting.
 * `ACCESS_COARSE_LOCATION`: unfortunately, Android 8.1+ now mandates this permission AND enabling location services for apps to get the SSID. So, if you are running Android 8.1 and above and want your profiles to sync only when you're connected to a specific SSID, this permission AND enabling location services is required.
+* `GET_ACCOUNTS`: Needed to register a handle in the account sync service to periodically run rsync
 
 Global Options
 --------------
@@ -83,7 +84,7 @@ $ gradle assembleRelease
 
 You have to have `gradle` installed. See [gradle.org](https://gradle.org) or your local fresh repo.
 
-Starting with v0.4.5.4, you need `gradle 4.4.1`, `build-tools 27.0.3`, and `ndk-tools r15c`.
+See ./gitlab-ci.yml for a reproducible build with build dependencies.
 
 How to get the latest debug build
 ---------------------------------
