@@ -1,41 +1,23 @@
 package org.amoradi.syncopoli;
 
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.os.PowerManager;
-import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.JobIntentService;
-import androidx.core.content.ContextCompat;
+
 
 public class BackupBackgroundService extends JobIntentService {
     public final static String TAG = "Syncopoli";
     private static final int JOB_ID = 1234;
-
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		Notification notif = getNotification(App.SYNC_CHANNEL_ID)
-				.setTicker("Syncopoli")
-				.setContentTitle("Syncopoli")
-				.setContentText("Sync in progress...")
-				.build();
-
-		startForeground(App.SYNC_NOTIF_ID, notif);
-	}
 
 	private NotificationCompat.Builder getNotification(String id) {
 		int notif_icon = R.drawable.ic_action_refresh_bitmap;
@@ -45,13 +27,17 @@ public class BackupBackgroundService extends JobIntentService {
 			notif_icon = R.drawable.ic_action_refresh;
 		}
 
+		int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			flags |= PendingIntent.FLAG_IMMUTABLE;
+		}
+
 		return new NotificationCompat.Builder(getApplicationContext(), id)
 				.setWhen(System.currentTimeMillis())
-				.setAutoCancel(true)
 				.setContentIntent(PendingIntent.getActivity(this,
 						0,
 						new Intent(this, BackupActivity.class),
-						PendingIntent.FLAG_UPDATE_CURRENT))
+						flags ))
 				.setSmallIcon(notif_icon);
 	}
 
@@ -61,17 +47,18 @@ public class BackupBackgroundService extends JobIntentService {
 
     @Override
     protected void onHandleWork(@NonNull Intent work) {
+		NotificationManager notifyMan = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         try {
 			Notification notif = getNotification(App.SYNC_CHANNEL_ID)
 					.setTicker("Syncopoli")
 					.setContentTitle("Syncopoli")
 					.setContentText("Sync in progress...")
+					.setOngoing(true)
 					.build();
-
-			startForeground(App.SYNC_NOTIF_ID, notif);
+			notifyMan.notify(null, App.SYNC_NOTIF_ID, notif);
             executeWork(work);
         } finally {
-			stopForeground(true);
+			notifyMan.cancel(App.SYNC_NOTIF_ID);
         }
     }
 
@@ -120,6 +107,7 @@ public class BackupBackgroundService extends JobIntentService {
 					.setTicker("Syncopoli")
 					.setContentTitle("Sync failed")
 					.setContentText(b.name)
+					.setAutoCancel(true)
 					.build();
 
 			NotificationManager notifyMan = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

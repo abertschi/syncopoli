@@ -62,6 +62,7 @@
             <intent-filter>
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED"/>
                 <action android:name="android.net.wifi.STATE_CHANGE"/>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
                 <action android:name="org.amoradi.syncopoli.SYNC_PROFILE"/>
             </intent-filter>
         </receiver>
