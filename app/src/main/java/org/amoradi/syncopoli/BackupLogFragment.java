@@ -179,8 +179,11 @@ public class BackupLogFragment extends Fragment {
         }
 
         public void addTextLines(List<TextLine> textLine) {
-            mItems.addAll(textLine);
-            notifyItemInserted(mItems.size() - 1);
+            int size = textLine.size();
+            if (size > 0) {
+                mItems.addAll(textLine);
+                notifyItemRangeInserted(mItems.size() - size - 1, size);
+            }
         }
 
         public void addTextLine(TextLine textLine) {

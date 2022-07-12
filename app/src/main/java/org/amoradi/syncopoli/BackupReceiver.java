@@ -14,7 +14,8 @@ public class BackupReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context ctx, Intent intent) {
         if (intent.getAction().equals("android.net.wifi.WIFI_STATE_CHANGED") ||
-            intent.getAction().equals("android.net.wifi.STATE_CHANGE")) {
+            intent.getAction().equals("android.net.wifi.STATE_CHANGE") ||
+                intent.getAction().equals("android.intent.action.ACTION_POWER_CONNECTED"))  {
             BackupHandler h = new BackupHandler(ctx);
             if (h.getRunOnWifi() && h.canRunBackup()) {
                 Account acc = new Account(BackupActivity.SYNC_ACCOUNT_NAME, BackupActivity.SYNC_ACCOUNT_TYPE);
