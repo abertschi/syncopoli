@@ -79,12 +79,11 @@ public class BackupBackgroundService extends JobIntentService {
             return;
         }
 
+		// XXX: items is always non null at this point
         Parcelable[] ps = bundle.getParcelableArray("items");
-        if (ps != null) {
-			for (Parcelable x : ps) {
-				BackupItem y = (BackupItem) x;
-				runTask(h, y);
-			}
+		for (Parcelable x : ps) {
+			BackupItem y = (BackupItem) x;
+			runTask(h, y);
 		}
 	}
 
