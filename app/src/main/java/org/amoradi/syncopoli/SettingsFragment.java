@@ -61,8 +61,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     @Override
     public void onAttach(Context context) {
-        // XXX: Avoid Nullpointer if fragement is detected and
-        // getActivity called in anonymous function
+        // XXX: Avoid Nullpointer if fragment is detached and
+        // getActivity is called in anonymous function
         super.onAttach(context);
         this.activity = (BackupActivity) context;
     }
