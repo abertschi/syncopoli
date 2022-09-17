@@ -92,7 +92,7 @@ public class BackupLogFragment extends Fragment {
 
     private void startWorker() {
         if (textLineAdapter == null){
-            return;
+            throw new IllegalStateException("Cannot start worker without initializing adapter.");
         }
         stopWorker();
         textLineAdapter.clear();
