@@ -48,18 +48,15 @@ public class BackupBackgroundService extends JobIntentService {
     @Override
     protected void onHandleWork(@NonNull Intent work) {
 		NotificationManager notifyMan = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        try {
-			Notification notif = getNotification(App.SYNC_CHANNEL_ID)
-					.setTicker("Syncopoli")
-					.setContentTitle("Syncopoli")
-					.setContentText("Sync in progress...")
-					.setOngoing(true)
-					.build();
-			notifyMan.notify(null, App.SYNC_NOTIF_ID, notif);
-            executeWork(work);
-        } finally {
-			notifyMan.cancel(App.SYNC_NOTIF_ID);
-        }
+		Notification notif = getNotification(App.SYNC_CHANNEL_ID)
+				.setTicker("Syncopoli")
+				.setContentTitle("Syncopoli")
+				.setContentText("Sync in progress...")
+				.setOngoing(true)
+				.build();
+		notifyMan.notify(null, App.SYNC_NOTIF_ID, notif);
+		executeWork(work);
+		notifyMan.cancel(App.SYNC_NOTIF_ID);
     }
 
 	private void executeWork(Intent work) {
