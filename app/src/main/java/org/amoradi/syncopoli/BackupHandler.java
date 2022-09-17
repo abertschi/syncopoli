@@ -397,7 +397,7 @@ public class BackupHandler implements IBackupHandler {
                 final_cmd.add(sb.toString());
 
                 Log.d(TAG, "with su: " + final_cmd.toString());
-                logFile.write(("with su:: " + final_cmd.toString() + "\n\n").getBytes());
+                logFile.write(("with su: " + final_cmd.toString() + "\n\n").getBytes());
             } else {
                 final_cmd = args;
             }
