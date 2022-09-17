@@ -250,15 +250,15 @@ public class BackupLogFragment extends Fragment {
 
             try {
                 String textLine = bufferedReader.readLine();
-                ArrayList<TextLine> ls = new ArrayList<>(ARRAY_CAP);
+                ArrayList<TextLine> lines = new ArrayList<>(ARRAY_CAP);
                 int readChunk = 0;
 
                 while (null != textLine) {
-                    ls.add(new TextLine(lineNumber, textLine));
+                    lines.add(new TextLine(lineNumber, textLine));
                     if (readChunk >= READ_CHUNK) {
-                        Message.obtain(lineHandler, 0, ls).sendToTarget();
+                        Message.obtain(lineHandler, 0, lines).sendToTarget();
                         readChunk = 0;
-                        ls = new ArrayList<>(ARRAY_CAP);
+                        lines = new ArrayList<>(ARRAY_CAP);
                     }
                     readChunk++;
                     if (stopped.get()) {
@@ -267,8 +267,8 @@ public class BackupLogFragment extends Fragment {
                     textLine = bufferedReader.readLine();
                     lineNumber++;
                 }
-                if (ls.size() > 0) {
-                    Message.obtain(lineHandler, 0, ls).sendToTarget();
+                if (lines.size() > 0) {
+                    Message.obtain(lineHandler, 0, lines).sendToTarget();
                 }
             } catch (IOException e) {
                 ArrayList<TextLine> msg = new ArrayList<>();
