@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BackupLogFragment extends Fragment {
-    private static final String TAG = "Syncpololi";
+    private static final String TAG = "Syncopoli";
 
     private BackupItem mBackupItem;
     private Thread textReaderThread;
