@@ -6,6 +6,8 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -133,4 +135,11 @@ class BackupItem implements Parcelable {
 		}
 	};
 
+    public String toJson() {
+        return new Gson().toJson(this);
+    }
+
+    public static BackupItem fromJson(String json) {
+        return new Gson().fromJson(json, BackupItem.class);
+    }
 }

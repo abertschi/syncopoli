@@ -100,7 +100,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             if (prefs.getString(KEY_FREQUENCY, "8").equals("")) {
                 prefs.edit().putString(KEY_FREQUENCY, Integer.toString(0)).apply();
             }
-            activity.setupSyncAccount();
+            activity.setupSyncing();
         }
 
         /*

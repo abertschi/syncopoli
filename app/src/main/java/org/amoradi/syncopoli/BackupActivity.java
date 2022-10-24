@@ -8,10 +8,8 @@ import android.app.FragmentTransaction;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,7 +18,6 @@ import androidx.annotation.LayoutRes;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 
 import android.util.Log;
 import android.view.Menu;
@@ -86,7 +83,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         }
 
         if (isFirstRun()) {
-            setupSyncAccount();
+            setupSyncing();
 
             if (copyExecutables() != 0) {
                 Toast.makeText(getApplicationContext(), "Unable to copy ssh and/or rsync executables. Please submit a bug report.", Toast.LENGTH_LONG).show();
@@ -145,41 +142,11 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         Toolbar t = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(t);
     }
-
-    public Account getOrCreateSyncAccount() {
-        /* get */
-        AccountManager accman = AccountManager.get(this);
-
-        for (Account acc : accman.getAccountsByType(SYNC_ACCOUNT_TYPE)) {
-            if (acc.name.equals(SYNC_ACCOUNT_NAME)) {
-                return acc;
-            }
-        }
-
-        /* if not found, create */
-        Account acc = new Account(SYNC_ACCOUNT_NAME, SYNC_ACCOUNT_TYPE);
-
-        if (accman.addAccountExplicitly(acc, null, null)) {
-            ContentResolver.setIsSyncable(acc, SYNC_AUTHORITY, 1);
-            ContentResolver.setSyncAutomatically(acc, SYNC_AUTHORITY, true);
-        }
-
-        return acc;
-    }
         
-    public void setupSyncAccount() {
-        Account acc = getOrCreateSyncAccount();
-
+    public void setupSyncing() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         long freq = Long.parseLong(prefs.getString(SettingsFragment.KEY_FREQUENCY, "8"));
-        freq = freq * 3600; // hours to seconds
-
-        // ContentResolver.addPeriodicSync enforces a min of 1 hour
-        if (freq == 0) {
-            ContentResolver.removePeriodicSync(acc, SYNC_AUTHORITY, new Bundle());
-        } else {
-            ContentResolver.addPeriodicSync(acc, SYNC_AUTHORITY, new Bundle(), freq);
-        }
+        BackupWorker.schedulePeriodic(this, (int) freq);
     }
 
     @Override
@@ -199,14 +166,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
                       Snackbar.LENGTH_SHORT).show();
 
         List<BackupItem> bs = mBackupHandler.getBackups();
-        BackupItem[] backups = new BackupItem[bs.size()];
-        bs.toArray(backups);
-
-
-        Intent i = new Intent(this, BackupBackgroundService.class);
-        i.putExtra("items", backups);
-        i.putExtra("force", true);
-        BackupBackgroundService.enqueueWork(this, i);
+        BackupWorker.syncNow(this, bs);
     }
 
     @Override
@@ -554,11 +514,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         Snackbar.make(findViewById(R.id.backuplist_coordinator),
                 "Running '" + b.name + "'",
                 Snackbar.LENGTH_SHORT).show();
-
-        Intent i = new Intent(this, BackupBackgroundService.class);
-        i.putExtra("item", b);
-        i.putExtra("force", true);
-        BackupBackgroundService.enqueueWork(this, i);
+        BackupWorker.syncNow(this, b);
         return 0;
     }
 

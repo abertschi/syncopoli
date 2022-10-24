@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
     package="org.amoradi.syncopoli">
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission
-            android:name="android.permission.GET_ACCOUNTS"
-            android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -33,30 +32,8 @@
         </activity>
 
         <service
-            android:name="org.amoradi.syncopoli.StubAuthenticatorService">
-            <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator"/>
-            </intent-filter>
-            <meta-data
-                android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
-        </service>
-
-        <service
-            android:name="org.amoradi.syncopoli.SyncService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter"/>
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter"
-                android:resource="@xml/syncadapter" />
-        </service>
-
-        <provider
-            android:name="org.amoradi.syncopoli.StubContentProvider"
-            android:authorities="org.amoradi.syncopoli.provider"
-            android:exported="false"
-            android:syncable="true"/>
+                android:name="androidx.work.impl.foreground.SystemForegroundService"
+                tools:node="merge" />
 
         <receiver android:name=".BackupReceiver">
             <intent-filter>
@@ -66,12 +43,6 @@
                 <action android:name="org.amoradi.syncopoli.SYNC_PROFILE"/>
             </intent-filter>
         </receiver>
-
-		<service
-			android:name=".BackupBackgroundService"
-			android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            />
 
     </application>
 </manifest>

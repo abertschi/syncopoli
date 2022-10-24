@@ -10,6 +10,9 @@ import android.os.Bundle;
 
 import androidx.core.content.ContextCompat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BackupReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context ctx, Intent intent) {
@@ -18,14 +21,8 @@ public class BackupReceiver extends BroadcastReceiver {
                 intent.getAction().equals("android.intent.action.ACTION_POWER_CONNECTED"))  {
             BackupHandler h = new BackupHandler(ctx);
             if (h.getRunOnWifi() && h.canRunBackup()) {
-                Account acc = new Account(BackupActivity.SYNC_ACCOUNT_NAME, BackupActivity.SYNC_ACCOUNT_TYPE);
-
-                Bundle settingsBundle = new Bundle();
-                settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-                settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-
                 h.setRunOnWifi(false);
-                ContentResolver.requestSync(acc, BackupActivity.SYNC_AUTHORITY, settingsBundle);
+                BackupWorker.syncNow(ctx, h.getBackups());
             }
         }
 
@@ -36,10 +33,7 @@ public class BackupReceiver extends BroadcastReceiver {
             if (b == null) {
                 return;
             }
-
-            Intent i = new Intent(ctx, BackupBackgroundService.class);
-            i.putExtra("item", b);
-            BackupBackgroundService.enqueueWork(ctx, i);
+            BackupWorker.syncNow(ctx, b);
         }
     }
 }

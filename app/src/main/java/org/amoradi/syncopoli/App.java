@@ -15,7 +15,6 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
         NotificationManager notifyMan = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
         if  (Build.VERSION.SDK_INT >= 26) {
