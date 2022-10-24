@@ -1,5 +1,6 @@
-v0.7 (PENDING)
+v0.7
 -----
+Changes by abertschi (https://abertschi.ch):
 - Add androidx.constraintlayout dependency
 - Fix gradle build for android studio 2021 (update to gradle-7.2)
 - Fix gitlab runner to work with gradle 7
@@ -12,6 +13,7 @@ v0.7 (PENDING)
 - Include rsync command in log file
 - Open activity if notification is pressed
 - Properly add permission to manifest which was used but not requested: get_accounts
+
 
 v0.6
 ----
