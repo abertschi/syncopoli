@@ -42,10 +42,6 @@ import org.json.*;
 public class BackupActivity extends AppCompatActivity implements IBackupHandler {
     private static final String TAG = "Syncopoli";
 
-    public static final String SYNC_AUTHORITY = "org.amoradi.syncopoli.provider";
-    public static final String SYNC_ACCOUNT_NAME = "Syncopoli Sync Account";
-    public static final String SYNC_ACCOUNT_TYPE = "org.amoradi.syncopoli";
-
     protected class Perm {
         public String value;
         public int code;
