@@ -112,6 +112,14 @@
                 android:summaryOff="@string/pref_sum_charger_and_battery"
                 android:summaryOn="@string/pref_sum_charger_only" />
 
+        <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_alarm_schedule_on"
+                android:title="@string/pref_alarm_schedule"
+                android:summaryOff="@string/pref_alarm_off"
+                android:summaryOn="@string/pref_alarm_on" />
+
+
         <EditTextPreference
             android:defaultValue=""
             android:inputType="text"

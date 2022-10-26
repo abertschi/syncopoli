@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import androidx.appcompat.app.AlertDialog;
+
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,9 +35,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public final static String KEY_AS_ROOT = "pref_key_as_root"; // boolean
     public final static String KEY_VERSION_CODE = "pref_key_version_code";
     public final static String KEY_CHARGER_ONLY = "pref_key_charger_only"; // boolean
+    public final static String KEY_ALARM_SCHEDULE = "pref_key_alarm_schedule_on"; // boolean
 
     public static boolean isSharedPreferenceBooleanKey(String k) {
-        return k.equals(SettingsFragment.KEY_WIFI_ONLY) || k.equals(SettingsFragment.KEY_AS_ROOT) || k.equals(SettingsFragment.KEY_CHARGER_ONLY);
+        return k.equals(SettingsFragment.KEY_WIFI_ONLY) || k.equals(SettingsFragment.KEY_AS_ROOT) || k.equals(SettingsFragment.KEY_CHARGER_ONLY)
+                || k.equals(SettingsFragment.KEY_ALARM_SCHEDULE);
     }
 
     private BackupActivity activity;
@@ -56,7 +60,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         KEY_WIFI_ONLY,
         KEY_WIFI_NAME,
         KEY_AS_ROOT,
-        KEY_CHARGER_ONLY
+        KEY_CHARGER_ONLY,
+        KEY_ALARM_SCHEDULE
     };
 
     @Override
@@ -70,6 +75,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (isSharedPreferenceBooleanKey(key)) {
+
+            if (key.equals(KEY_ALARM_SCHEDULE)) {
+                boolean scheduled = isAlarmSchedulerEnabled(this.activity);
+                if (scheduled) {
+                    new ScheduleManager(this.activity).scheduleWithAlarm();
+                }
+            }
             return;
         }
 
@@ -100,7 +112,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             if (prefs.getString(KEY_FREQUENCY, "8").equals("")) {
                 prefs.edit().putString(KEY_FREQUENCY, Integer.toString(0)).apply();
             }
-            activity.setupSyncing();
+            BackupActivity.setupSyncing(this.activity);
         }
 
         /*
@@ -165,6 +177,21 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         for (String key : keys) {
             onSharedPreferenceChanged(sp, key);
         }
+    }
+
+    public static int getFrequency(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return (int) Long.parseLong(prefs.getString(SettingsFragment.KEY_FREQUENCY, "8"));
+    }
+
+    public static boolean isAlarmSchedulerEnabled(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(SettingsFragment.KEY_ALARM_SCHEDULE, false);
+    }
+
+    public static void setAlarmSchedulerEnabled(Context context, boolean enabled) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.edit().putBoolean(SettingsFragment.KEY_ALARM_SCHEDULE, enabled);
     }
 
 	private class AcceptHostFingerprintTask extends AsyncTask<Void, Void, Boolean> {

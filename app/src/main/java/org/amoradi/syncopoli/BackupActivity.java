@@ -65,7 +65,6 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         new Perm(android.Manifest.permission.ACCESS_WIFI_STATE, 6),
         new Perm(android.Manifest.permission.ACCESS_COARSE_LOCATION, 7),
         new Perm(android.Manifest.permission.WAKE_LOCK, 8),
-        new Perm(Manifest.permission.GET_ACCOUNTS, 9)
     };
 
     BackupHandler mBackupHandler;
@@ -78,13 +77,11 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
     }
 
     protected void setup(boolean checkPerms) {
+        setupSyncing(this);
         if (checkPerms) {
             checkRuntimePerms();
         }
-
         if (isFirstRun()) {
-            setupSyncing();
-
             if (copyExecutables() != 0) {
                 Toast.makeText(getApplicationContext(), "Unable to copy ssh and/or rsync executables. Please submit a bug report.", Toast.LENGTH_LONG).show();
             }
@@ -123,7 +120,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
                     return false;
                 }
             }
-        }       
+        }
 
         return true;
     }
@@ -142,11 +139,16 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         Toolbar t = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(t);
     }
-        
-    public void setupSyncing() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        long freq = Long.parseLong(prefs.getString(SettingsFragment.KEY_FREQUENCY, "8"));
-        BackupWorker.schedulePeriodic(this, (int) freq);
+
+    public static void setupSyncing(Context context) {
+        /*
+         * We reschedule the pending tasks when application launches.
+         */
+        ScheduleManager manager = new ScheduleManager(context);
+        manager.scheduleWithJob();
+        if (manager.isAlarmSchedulerEnabled()) {
+            manager.scheduleWithAlarm();
+        }
     }
 
     @Override
@@ -198,7 +200,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 
 	public int exportSettings() {
 		List<BackupItem> backups = mBackupHandler.getBackups();
-		
+
 		JSONObject exportObj = new JSONObject();
 
         try {
@@ -232,7 +234,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 			Log.e(TAG, "ERROR exporting globals while adding to exportObj: " + e.getMessage());
 			return -1;
 		}
-		
+
 		/*
 		 * get profile configs
 		 */
@@ -280,7 +282,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 			Log.e(TAG, "ERROR exporting profiles while writing: " + e.getMessage());
 			return -1;
 		}
-		
+
 		return 0;
 	}
 
@@ -339,7 +341,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
                       e.getMessage());
                 return -1;
             }
-            
+
             if (version == 2) {
                 ret = importSettingsV2(exportedSettings);
             } else {
@@ -436,7 +438,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
             Log.e(TAG, "ERROR import version 2 profiles: " + e.getMessage());
             return -1;
         }
-        
+
         if (importGlobalSettings(globals) != 0) {
             return -1;
         }
@@ -541,13 +543,13 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 		if (ret != 0) {
 			return ret;
 		}
-		
+
         return copyExecutable("ssh");
     }
 
     public int copyExecutable(String filename) {
         // copy and overwrite
-        
+
         File file = getFileStreamPath(filename);
 
 		String[] abis = {Build.CPU_ABI, Build.CPU_ABI2};
@@ -556,7 +558,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 		}
 
 		InputStream src = null;
-		
+
 		// try to grab matching executable for a ABI supported by this device
 		for (String abi : abis) {
             try {

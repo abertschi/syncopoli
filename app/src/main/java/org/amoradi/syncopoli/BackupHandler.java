@@ -38,13 +38,13 @@ public class BackupHandler implements IBackupHandler {
 
     private List<BackupItem> mBackupItems;
     Context mContext;
-
     public static final int ERROR_DONOTRUN = -2;
     public static final int ERROR_BACKUP_EXISTS = -3;
     public static final int ERROR_BACKUP_MISSING = -4;
     public static final int ERROR_TOO_MANY_RESULTS = -5;
     public static final int ERROR_RSYNC_MISSING = -6;
     public static final int ERROR_SSH_MISSING = -7;
+    public static final int ERROR_GENERIC = -8;
 
     public BackupHandler(Context ctx) {
         mContext = ctx;

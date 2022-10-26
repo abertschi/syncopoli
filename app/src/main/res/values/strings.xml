@@ -51,8 +51,12 @@
     <string name="pref_title_clear_hosts">Clear trusted hosts</string>
 
     <string name="pref_title_charger">Charging only</string>
+    <string name="pref_alarm_schedule">Use Alarm Manager</string>
     <string name="pref_sum_charger_only">Sync will require phone connected to charger to proceed</string>
     <string name="pref_sum_charger_and_battery">Sync will proceed on battery or charger</string>
+
+    <string name="pref_alarm_on">Ensure frequent sync by scheduling task with Alarm Manager. Enable this if task is not frequently executed.</string>
+    <string name="pref_alarm_off">Rely on OS scheduling for periodic sync.</string>
 
 
     <string-array name="pref_entries_protocol">
