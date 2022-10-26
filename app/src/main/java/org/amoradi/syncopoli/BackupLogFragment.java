@@ -52,6 +52,8 @@ public class BackupLogFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = null;
+        textLineAdapter = new TextLineAdapter(container.getContext());
+
         if (mBackupItem != null) {
             textLineHandler = new Handler(Looper.getMainLooper()) {
                 @Override
@@ -62,7 +64,6 @@ public class BackupLogFragment extends Fragment {
                 }
             };
             view = inflater.inflate(R.layout.fragment_backuplog, container, false);
-            textLineAdapter = new TextLineAdapter(container.getContext());
             recycleView = view.findViewById(R.id.recyclerView);
             recycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
             recycleView.setAdapter(textLineAdapter);
@@ -101,6 +102,7 @@ public class BackupLogFragment extends Fragment {
             textReaderThread = new TextReaderThread(in, textLineHandler);
             textReaderThread.start();
         } catch (FileNotFoundException e) {
+            stopWorker();
             textLineAdapter.addTextLine(new TextLine(0, e.getMessage()));
             e.printStackTrace();
         }
@@ -241,6 +243,15 @@ public class BackupLogFragment extends Fragment {
             this.lineHandler = lineHandler;
         }
 
+        private void cleanUp() {
+            try {
+                in.close();
+                stopped.set(true);
+            } catch (IOException e) {
+                // Ignore
+            }
+        }
+
         public void run() {
             Log.i(TAG, "Start text reader thread");
             stopped.set(false);
@@ -276,12 +287,20 @@ public class BackupLogFragment extends Fragment {
                 Message.obtain(lineHandler, 0, msg).sendToTarget();
                 e.printStackTrace();
             }
+
+            try {
+                bufferedReader.close();
+            } catch (IOException e) {
+                // XXX: ignore
+            }
+            cleanUp();
         }
 
         @Override
         public void interrupt() {
-            stopped.set(true);
+            cleanUp();
             super.interrupt();
+
         }
     }
 }
