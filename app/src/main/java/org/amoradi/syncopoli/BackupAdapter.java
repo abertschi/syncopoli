@@ -90,12 +90,15 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int pos) {
-        holder.mProfileTextView.setText(mBackupHandler.getBackups().get(pos).name);
-
-        if (mBackupHandler.getBackups().get(pos).lastUpdate == null) {
+        final BackupItem item = mBackupHandler.getBackups().get(pos);
+        if (item == null) {
+            return;
+        }
+        holder.mProfileTextView.setText(item.name);
+        if (item.lastUpdate == null) {
             holder.mSrcTextView.setText("This backup has never run");
         } else {
-            holder.mSrcTextView.setText("Last update: " + mBackupHandler.getBackups().get(pos).lastUpdate.toString());
+            holder.mSrcTextView.setText("Last update: " + item.lastUpdate.toString());
         }
 
         holder.mView.setTranslationX(holder.mView.getTranslationX() -50f);
@@ -115,25 +118,45 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
     }
 
     public void onBackupShowLog(int pos) {
-        mBackupHandler.showLog(mBackupHandler.getBackups().get(pos));
+        BackupItem item = mBackupHandler.getBackups().get(pos);
+        if (item == null) {
+            return;
+        }
+        mBackupHandler.showLog(item);
     }
 
     public void onBackupDelete(int pos) {
-        mBackupHandler.removeBackup(mBackupHandler.getBackups().get(pos));
+        BackupItem item = mBackupHandler.getBackups().get(pos);
+        if (item == null) {
+            return;
+        }
+        mBackupHandler.removeBackup(item);
         notifyDataSetChanged();
     }
 
     public void onBackupEdit(int pos) {
-        mBackupHandler.editBackup(mBackupHandler.getBackups().get(pos));
+        BackupItem item = mBackupHandler.getBackups().get(pos);
+        if (item == null) {
+            return;
+        }
+        mBackupHandler.editBackup(item);
 		notifyDataSetChanged();
     }
 
     public void onBackupCopy(int pos) {
-        mBackupHandler.copyBackup(mBackupHandler.getBackups().get(pos));
+        BackupItem item = mBackupHandler.getBackups().get(pos);
+        if (item == null) {
+            return;
+        }
+        mBackupHandler.copyBackup(item);
         notifyDataSetChanged();
     }
 
     public void onBackupRun(int pos) {
-        mBackupHandler.runBackup(mBackupHandler.getBackups().get(pos));
+        BackupItem item = mBackupHandler.getBackups().get(pos);
+        if (item == null) {
+            return;
+        }
+        mBackupHandler.runBackup(item);
     }
 }
